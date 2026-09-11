@@ -3,6 +3,7 @@ import LandingPage from "./components/LandingPage";
 import "./components/LandingPage.css";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { isSupabaseConfigured } from "./supabaseClient";
+
 import AuthPage from "./pages/AuthPage";
 import CitizenDashboard from "./pages/CitizenDashboard";
 import WorkerDashboard from "./pages/WorkerDashboard";
@@ -14,95 +15,189 @@ const ROLE_LABEL = {
   admin: "Admin",
 };
 
+
+// ===============================
+// DASHBOARD SHELL
+// ===============================
+
 function Shell() {
   const { profile, signOut } = useAuth();
 
   return (
     <div id="app-root">
+
       <div className="topbar">
+
         <div className="brand">
           <span className="leaf">🌿</span>
+
           Smart Swachh
+
           <span className="role-pill">
             {ROLE_LABEL[profile.role]}
           </span>
         </div>
 
+
         <div className="topbar-right">
-          <span>{profile.name}</span>
+
+          <span>
+            {profile.name}
+          </span>
+
           <button
             className="btn-ghost-light"
             onClick={signOut}
           >
             Log out
           </button>
+
         </div>
+
       </div>
 
+
       <main>
-        {profile.role === "citizen" && <CitizenDashboard />}
-        {profile.role === "worker" && <WorkerDashboard />}
-        {profile.role === "admin" && <AdminDashboard />}
+
+        {profile.role === "citizen" && (
+          <CitizenDashboard />
+        )}
+
+        {profile.role === "worker" && (
+          <WorkerDashboard />
+        )}
+
+        {profile.role === "admin" && (
+          <AdminDashboard />
+        )}
+
       </main>
+
     </div>
   );
 }
 
+
+// ===============================
+// SUPABASE SETUP ERROR
+// ===============================
+
 function SetupNeeded() {
+
   return (
+
     <div className="auth-wrap">
+
       <div className="auth-card">
-        <h1 style={{ fontSize: 20 }}>
+
+        <h1>
           Almost ready
         </h1>
 
         <p>
           Please configure Supabase and restart the application.
         </p>
+
       </div>
+
     </div>
+
   );
+
 }
 
-function AppContent({ showAuth }) {
-  const { session, profile, loading } = useAuth();
+
+// ===============================
+// APP ROUTER
+// ===============================
+
+function AppRouter() {
+
+  const {
+    session,
+    profile,
+    loading
+  } = useAuth();
+
+
+  const [showAuth, setShowAuth] =
+    useState(false);
+
+
+  // Loading Auth
 
   if (loading) {
-    return <div className="center-page">Loading...</div>;
+
+    return (
+
+      <div className="center-page">
+
+        Loading...
+
+      </div>
+
+    );
+
   }
 
-  // User logged in
+
+  // Already logged in
+
   if (session && profile) {
+
     return <Shell />;
+
   }
 
-  // User not logged in
-  if (showAuth) {
-    return <AuthPage />;
+
+  // Landing Page
+
+  if (!showAuth) {
+
+    return (
+
+      <LandingPage
+
+        onGetStarted={() =>
+          setShowAuth(true)
+        }
+
+      />
+
+    );
+
   }
 
-  return null;
+
+  // Login / Signup
+
+  return <AuthPage />;
+
 }
 
-export default function App() {
-  const [showAuth, setShowAuth] = useState(false);
 
-  // Landing Page FIRST
-  if (!showAuth) {
-    return (
-      <LandingPage
-        onGetStarted={() => setShowAuth(true)}
-      />
-    );
-  }
+// ===============================
+// MAIN APP
+// ===============================
+
+export default function App() {
+
 
   if (!isSupabaseConfigured) {
+
     return <SetupNeeded />;
+
   }
 
+
   return (
+
     <AuthProvider>
-      <AppContent showAuth={showAuth} />
+
+      <AppRouter />
+
     </AuthProvider>
+
   );
+
 }
