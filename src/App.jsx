@@ -1,6 +1,8 @@
 import { useState } from "react";
 import LandingPage from "./components/LandingPage";
 import "./components/LandingPage.css";
+import Chatbot from "./components/Chatbot";
+
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { isSupabaseConfigured } from "./supabaseClient";
 
@@ -15,7 +17,6 @@ const ROLE_LABEL = {
   admin: "Admin",
 };
 
-
 // ===============================
 // DASHBOARD SHELL
 // ===============================
@@ -25,9 +26,7 @@ function Shell() {
 
   return (
     <div id="app-root">
-
       <div className="topbar">
-
         <div className="brand">
           <span className="leaf">🌿</span>
 
@@ -38,12 +37,8 @@ function Shell() {
           </span>
         </div>
 
-
         <div className="topbar-right">
-
-          <span>
-            {profile.name}
-          </span>
+          <span>{profile.name}</span>
 
           <button
             className="btn-ghost-light"
@@ -51,14 +46,10 @@ function Shell() {
           >
             Log out
           </button>
-
         </div>
-
       </div>
 
-
       <main>
-
         {profile.role === "citizen" && (
           <CitizenDashboard />
         )}
@@ -70,134 +61,86 @@ function Shell() {
         {profile.role === "admin" && (
           <AdminDashboard />
         )}
-
       </main>
-
     </div>
   );
 }
-
 
 // ===============================
 // SUPABASE SETUP ERROR
 // ===============================
 
 function SetupNeeded() {
-
   return (
-
     <div className="auth-wrap">
-
       <div className="auth-card">
-
-        <h1>
-          Almost ready
-        </h1>
+        <h1>Almost ready</h1>
 
         <p>
           Please configure Supabase and restart the application.
         </p>
-
       </div>
-
     </div>
-
   );
-
 }
-
 
 // ===============================
 // APP ROUTER
 // ===============================
 
 function AppRouter() {
-
   const {
     session,
     profile,
     loading
   } = useAuth();
 
-
   const [showAuth, setShowAuth] =
     useState(false);
 
-
-  // Loading Auth
-
   if (loading) {
-
     return (
-
       <div className="center-page">
-
         Loading...
-
       </div>
-
     );
-
   }
-
 
   // Already logged in
-
   if (session && profile) {
-
     return <Shell />;
-
   }
 
-
   // Landing Page
-
   if (!showAuth) {
-
     return (
-
       <LandingPage
-
         onGetStarted={() =>
           setShowAuth(true)
         }
-
       />
-
     );
-
   }
 
-
   // Login / Signup
-
   return <AuthPage />;
-
 }
-
 
 // ===============================
 // MAIN APP
 // ===============================
 
 export default function App() {
-
-
   if (!isSupabaseConfigured) {
-
     return <SetupNeeded />;
-
   }
 
-
   return (
-
     <AuthProvider>
-
       <AppRouter />
 
+      {/* Global AI Chatbot */}
+      <Chatbot />
     </AuthProvider>
-
   );
-
 }

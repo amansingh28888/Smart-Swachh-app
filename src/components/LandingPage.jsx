@@ -1,4 +1,5 @@
 import React from "react";
+import WasteGame from "./WasteGame";
 
 export default function LandingPage({ onGetStarted }) {
   return (
@@ -96,6 +97,25 @@ export default function LandingPage({ onGetStarted }) {
           </div>
 
         </div>
+      </section>
+
+
+      {/* SmartSort Game */}
+      <section className="game-section">
+
+        <div className="section-title">
+          <p>LEARN WHILE PLAYING</p>
+
+          <h2>Can You Sort Waste Correctly? 🎮</h2>
+
+          <div className="game-intro">
+            Learn proper waste segregation while having fun!
+            Choose the correct bin and become an Eco Champion. 🌱
+          </div>
+        </div>
+
+        <WasteGame />
+
       </section>
 
 
