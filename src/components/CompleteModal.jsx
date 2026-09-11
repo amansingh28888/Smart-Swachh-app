@@ -9,7 +9,6 @@ export default function CompleteModal({
 }) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [verificationCode, setVerificationCode] = useState("");
 
   const [err, setErr] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -32,37 +31,11 @@ export default function CompleteModal({
       return;
     }
 
-    if (verificationCode.length !== 6) {
-      setErr("Please enter the 6-digit SmartVerify code.");
-      return;
-    }
-
     setSubmitting(true);
     setErr("");
 
     try {
-      // Step 1: Get report verification code
-      const { data: report, error: reportErr } = await supabase
-        .from("reports")
-        .select("verification_code")
-        .eq("id", reportId)
-        .single();
-
-      if (reportErr) throw reportErr;
-
-      // Step 2: Verify code
-      if (
-        String(report.verification_code) !==
-        String(verificationCode)
-      ) {
-        setErr(
-          "❌ Incorrect SmartVerify code. Ask the citizen for the correct code."
-        );
-        setSubmitting(false);
-        return;
-      }
-
-      // Step 3: Upload AFTER photo
+      // Step 1: Upload AFTER photo
       const path =
         `${profile.id}/${Date.now()}-after-${file.name}`;
 
@@ -72,27 +45,27 @@ export default function CompleteModal({
 
       if (upErr) throw upErr;
 
+      // Step 2: Get public URL
       const { data: pub } = supabase.storage
         .from("waste-photos")
         .getPublicUrl(path);
 
-      // Step 4: Complete report
-      const { error: rpcErr } = await supabase.rpc(
-        "complete_report",
-        {
-          p_report_id: reportId,
-          p_after_photo_url: pub.publicUrl,
-        }
-      );
+      // Step 3: Send work for citizen approval
+      const { error: updateErr } = await supabase
+        .from("reports")
+        .update({
+          after_photo_url: pub.publicUrl,
+          status: "pending_approval",
+        })
+        .eq("id", reportId);
 
-      if (rpcErr) throw rpcErr;
+      if (updateErr) throw updateErr;
 
+      // Refresh dashboard
       onCompleted();
 
     } catch (error) {
-
       setErr(error.message);
-
     }
 
     setSubmitting(false);
@@ -114,7 +87,7 @@ export default function CompleteModal({
           ×
         </button>
 
-        <h2>Complete Task</h2>
+        <h2>Send for Citizen Approval</h2>
 
         <p
           style={{
@@ -122,8 +95,9 @@ export default function CompleteModal({
             color: "var(--ink-soft)",
           }}
         >
-          Upload proof of the cleaned location and enter the
-          SmartVerify code provided by the citizen.
+          Upload a photo of the cleaned location.
+          The citizen will review the work before
+          final verification.
         </p>
 
         <form onSubmit={submit}>
@@ -166,51 +140,6 @@ export default function CompleteModal({
             onChange={onPhoto}
           />
 
-          {/* SMARTVERIFY CODE */}
-
-          <div
-            className="field"
-            style={{
-              marginTop: 16,
-            }}
-          >
-            <label>
-              🔐 SmartVerify Code
-            </label>
-
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength="6"
-              placeholder="Enter 6-digit code"
-              value={verificationCode}
-              onChange={(e) =>
-                setVerificationCode(
-                  e.target.value.replace(/\D/g, "")
-                )
-              }
-              style={{
-                fontSize: 20,
-                fontWeight: 700,
-                letterSpacing: 4,
-                textAlign: "center",
-              }}
-              required
-            />
-
-            <small
-              style={{
-                color: "var(--ink-soft)",
-                display: "block",
-                marginTop: 6,
-              }}
-            >
-              Ask the citizen for this code after the waste has
-              been cleaned.
-            </small>
-
-          </div>
-
           {err && (
             <div
               className="msg error"
@@ -234,8 +163,8 @@ export default function CompleteModal({
             )}
 
             {submitting
-              ? "Verifying..."
-              : "Verify & Complete Task"}
+              ? "Sending..."
+              : "Send for Citizen Approval"}
           </button>
 
         </form>

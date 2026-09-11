@@ -3,7 +3,10 @@ import Stepper from "./Stepper";
 const STATUS_LABEL = {
   pending: "Pending",
   assigned: "Assigned",
-  in_progress: "In progress",
+  in_progress: "In Progress",
+  pending_approval: "Pending Citizen Approval",
+  approved: "Approved - Verification Required",
+  reopened: "Reopened",
   completed: "Completed",
 };
 
@@ -29,7 +32,14 @@ export default function ReportCard({
 
   return (
     <div className="report">
-      <img src={r.photo_url} alt="waste report" />
+
+      {/* BEFORE / REPORTED WASTE PHOTO */}
+
+      <img
+        className="report-main-image"
+        src={r.photo_url}
+        alt="Waste report"
+      />
 
       <div className="report-body">
 
@@ -103,11 +113,39 @@ export default function ReportCard({
           </p>
         )}
 
-        {/* 🔐 SMARTVERIFY CODE - ONLY CITIZEN */}
+        {/* AFTER CLEANING PHOTO */}
+
+        {r.after_photo_url && (
+          <div
+            style={{
+              marginTop: 14,
+            }}
+          >
+
+            <p
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                marginBottom: 8,
+              }}
+            >
+              📸 Work Completion Photo
+            </p>
+
+            <img
+              className="completion-image"
+              src={r.after_photo_url}
+              alt="Cleaned location"
+            />
+
+          </div>
+        )}
+
+        {/* SMARTVERIFY CODE */}
 
         {showVerificationCode &&
           r.verification_code &&
-          r.status !== "completed" && (
+          r.status === "approved" && (
 
             <div
               style={{
@@ -148,8 +186,8 @@ export default function ReportCard({
                   color: "var(--ink-soft)",
                 }}
               >
-                Share this code with the worker ONLY after
-                your waste has been cleaned.
+                Share this code with the worker after approving
+                the cleaned location photo.
               </div>
 
             </div>

@@ -1,9 +1,14 @@
 import { useState } from "react";
+
 import LandingPage from "./components/LandingPage";
 import "./components/LandingPage.css";
 import Chatbot from "./components/Chatbot";
 
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import {
+  AuthProvider,
+  useAuth,
+} from "./context/AuthContext";
+
 import { isSupabaseConfigured } from "./supabaseClient";
 
 import AuthPage from "./pages/AuthPage";
@@ -17,6 +22,7 @@ const ROLE_LABEL = {
   admin: "Admin",
 };
 
+
 // ===============================
 // DASHBOARD SHELL
 // ===============================
@@ -24,21 +30,67 @@ const ROLE_LABEL = {
 function Shell() {
   const { profile, signOut } = useAuth();
 
+  const [showLanding, setShowLanding] =
+    useState(false);
+
+
+  // ===============================
+  // SHOW LANDING PAGE
+  // ===============================
+
+  if (showLanding) {
+    return (
+      <LandingPage
+        onGetStarted={() =>
+          setShowLanding(false)
+        }
+      />
+    );
+  }
+
+
   return (
     <div id="app-root">
+
+      {/* ===============================
+          TOPBAR
+      =============================== */}
+
       <div className="topbar">
-        <div className="brand">
-          <span className="leaf">🌿</span>
+
+        {/* CLICKABLE BRAND */}
+
+        <div
+          className="brand"
+          onClick={() =>
+            setShowLanding(true)
+          }
+          style={{
+            cursor: "pointer",
+          }}
+          title="Go to Smart Swachh Home"
+        >
+
+          <span className="leaf">
+            🌿
+          </span>
 
           Smart Swachh
 
           <span className="role-pill">
             {ROLE_LABEL[profile.role]}
           </span>
+
         </div>
 
+
+        {/* USER + LOGOUT */}
+
         <div className="topbar-right">
-          <span>{profile.name}</span>
+
+          <span>
+            {profile.name}
+          </span>
 
           <button
             className="btn-ghost-light"
@@ -46,10 +98,18 @@ function Shell() {
           >
             Log out
           </button>
+
         </div>
+
       </div>
 
+
+      {/* ===============================
+          DASHBOARD
+      =============================== */}
+
       <main>
+
         {profile.role === "citizen" && (
           <CitizenDashboard />
         )}
@@ -61,86 +121,148 @@ function Shell() {
         {profile.role === "admin" && (
           <AdminDashboard />
         )}
+
       </main>
+
     </div>
   );
 }
+
 
 // ===============================
 // SUPABASE SETUP ERROR
 // ===============================
 
 function SetupNeeded() {
+
   return (
+
     <div className="auth-wrap">
+
       <div className="auth-card">
-        <h1>Almost ready</h1>
+
+        <h1>
+          Almost ready
+        </h1>
 
         <p>
-          Please configure Supabase and restart the application.
+          Please configure Supabase and restart
+          the application.
         </p>
+
       </div>
+
     </div>
+
   );
+
 }
+
 
 // ===============================
 // APP ROUTER
 // ===============================
 
 function AppRouter() {
+
   const {
     session,
     profile,
-    loading
+    loading,
   } = useAuth();
+
 
   const [showAuth, setShowAuth] =
     useState(false);
 
+
+  // ===============================
+  // LOADING
+  // ===============================
+
   if (loading) {
+
     return (
+
       <div className="center-page">
         Loading...
       </div>
+
     );
+
   }
 
-  // Already logged in
+
+  // ===============================
+  // ALREADY LOGGED IN
+  // ===============================
+
   if (session && profile) {
-    return <Shell />;
+
+    return (
+      <Shell />
+    );
+
   }
 
-  // Landing Page
+
+  // ===============================
+  // LANDING PAGE
+  // ===============================
+
   if (!showAuth) {
+
     return (
+
       <LandingPage
         onGetStarted={() =>
           setShowAuth(true)
         }
       />
+
     );
+
   }
 
-  // Login / Signup
-  return <AuthPage />;
+
+  // ===============================
+  // LOGIN / SIGNUP
+  // ===============================
+
+  return (
+    <AuthPage />
+  );
+
 }
+
 
 // ===============================
 // MAIN APP
 // ===============================
 
 export default function App() {
+
   if (!isSupabaseConfigured) {
-    return <SetupNeeded />;
+
+    return (
+      <SetupNeeded />
+    );
+
   }
 
+
   return (
+
     <AuthProvider>
+
       <AppRouter />
 
-      {/* Global AI Chatbot */}
+      {/* GLOBAL AI CHATBOT */}
+
       <Chatbot />
+
     </AuthProvider>
+
   );
+
 }

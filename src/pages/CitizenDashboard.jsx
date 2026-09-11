@@ -12,8 +12,12 @@ export default function CitizenDashboard() {
   const [withdrawals, setWithdrawals] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
+
   const [err, setErr] = useState("");
   const [ok, setOk] = useState("");
+
+  // Approval loading state
+  const [actionLoading, setActionLoading] = useState(null);
 
   async function load() {
     const { data: r, error: reportError } = await supabase
@@ -46,6 +50,88 @@ export default function CitizenDashboard() {
       load();
     }
   }, [profile?.id]);
+
+  // ===============================
+  // APPROVE WORK
+  // ===============================
+
+  async function approveWork(reportId) {
+    const confirmed = window.confirm(
+      "Are you satisfied with the cleaning work shown in the photo?"
+    );
+
+    if (!confirmed) return;
+
+    setActionLoading(reportId);
+    setErr("");
+    setOk("");
+
+    try {
+      const { error } = await supabase
+        .from("reports")
+        .update({
+          status: "approved",
+        })
+        .eq("id", reportId)
+        .eq("citizen_id", profile.id);
+
+      if (error) throw error;
+
+      setOk(
+        "Work approved successfully. Please share your SmartVerify code with the worker to complete verification."
+      );
+
+      await load();
+
+    } catch (error) {
+      setErr(error.message);
+    }
+
+    setActionLoading(null);
+  }
+
+  // ===============================
+  // REJECT WORK
+  // ===============================
+
+  async function rejectWork(reportId) {
+    const confirmed = window.confirm(
+      "Are you sure the work has not been completed properly?"
+    );
+
+    if (!confirmed) return;
+
+    setActionLoading(reportId);
+    setErr("");
+    setOk("");
+
+    try {
+      const { error } = await supabase
+        .from("reports")
+        .update({
+          status: "reopened",
+        })
+        .eq("id", reportId)
+        .eq("citizen_id", profile.id);
+
+      if (error) throw error;
+
+      setOk(
+        "The report has been reopened. The worker will need to complete the task again."
+      );
+
+      await load();
+
+    } catch (error) {
+      setErr(error.message);
+    }
+
+    setActionLoading(null);
+  }
+
+  // ===============================
+  // WITHDRAW POINTS
+  // ===============================
 
   async function requestWithdraw(e) {
     e.preventDefault();
@@ -105,6 +191,10 @@ export default function CitizenDashboard() {
     await load();
   }
 
+  // ===============================
+  // STATISTICS
+  // ===============================
+
   const activeCount = reports.filter(
     (r) => r.status !== "completed"
   ).length;
@@ -113,8 +203,14 @@ export default function CitizenDashboard() {
     (r) => r.status === "completed"
   ).length;
 
+  // ===============================
+  // UI
+  // ===============================
+
   return (
     <>
+      {/* POINTS BANNER */}
+
       <div className="points-banner">
         <div>
           <div className="amt">
@@ -127,7 +223,9 @@ export default function CitizenDashboard() {
               profile.points *
               CONFIG.POINTS_TO_INR_RATE
             ).toFixed(2)}
+
             {" · "}
+
             withdraw {CONFIG.MIN_WITHDRAW_POINTS}+ points anytime
           </div>
         </div>
@@ -144,6 +242,8 @@ export default function CitizenDashboard() {
         </button>
       </div>
 
+      {/* REPORT HEADER */}
+
       <div className="section-head">
         <h2>Your Reports</h2>
 
@@ -155,7 +255,10 @@ export default function CitizenDashboard() {
         </button>
       </div>
 
+      {/* STATISTICS */}
+
       <div className="stat-row">
+
         <div className="stat">
           <div className="num">
             {reports.length}
@@ -185,7 +288,10 @@ export default function CitizenDashboard() {
             Resolved
           </div>
         </div>
+
       </div>
+
+      {/* ERROR */}
 
       {err && (
         <div className="msg error">
@@ -193,17 +299,22 @@ export default function CitizenDashboard() {
         </div>
       )}
 
+      {/* SUCCESS */}
+
       {ok && (
         <div className="msg ok">
           {ok}
         </div>
       )}
 
+      {/* WITHDRAW */}
+
       {showWithdraw && (
         <div
           className="auth-card"
           style={{ marginBottom: 20 }}
         >
+
           <h3
             style={{
               marginTop: 0,
@@ -214,7 +325,9 @@ export default function CitizenDashboard() {
           </h3>
 
           <form onSubmit={requestWithdraw}>
+
             <div className="field">
+
               <label>
                 Points to redeem (min{" "}
                 {CONFIG.MIN_WITHDRAW_POINTS})
@@ -227,16 +340,20 @@ export default function CitizenDashboard() {
                 step="1"
                 required
               />
+
             </div>
 
             <button className="btn btn-sm">
               Submit Request
             </button>
+
           </form>
 
           {withdrawals.length > 0 && (
             <div style={{ marginTop: 14 }}>
+
               {withdrawals.map((w) => (
+
                 <div
                   key={w.id}
                   style={{
@@ -249,6 +366,7 @@ export default function CitizenDashboard() {
                       "space-between",
                   }}
                 >
+
                   <span>
                     {w.points} pts → ₹{w.amount_inr}
                   </span>
@@ -265,33 +383,138 @@ export default function CitizenDashboard() {
                   >
                     {w.status}
                   </span>
+
                 </div>
+
               ))}
+
             </div>
           )}
+
         </div>
       )}
 
+      {/* REPORTS */}
+
       {reports.length === 0 ? (
+
         <div className="empty">
           No reports yet. Spotted some waste on your street?
           Tap "Report a problem".
         </div>
+
       ) : (
+
         reports.map((r) => (
-          <ReportCard
+
+          <div
             key={r.id}
-            report={r}
-            showVerificationCode={true}
-          />
+            style={{
+              marginBottom: 16,
+            }}
+          >
+
+            <ReportCard
+              report={r}
+              showVerificationCode={true}
+            />
+
+            {/* CITIZEN APPROVAL */}
+
+            {r.status === "pending_approval" && (
+
+              <div
+                style={{
+                  padding: 14,
+                  marginTop: -8,
+                  borderRadius: "0 0 12px 12px",
+                  border: "1px solid var(--line)",
+                  borderTop: "none",
+                  background: "#f8fbff",
+                }}
+              >
+
+                <div
+                  style={{
+                    fontWeight: 700,
+                    marginBottom: 6,
+                  }}
+                >
+                  📸 Review Completed Work
+                </div>
+
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "var(--ink-soft)",
+                    marginTop: 0,
+                  }}
+                >
+                  Please check the completion photo. Are you
+                  satisfied with the cleaning work?
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                  }}
+                >
+
+                  <button
+                    className="btn"
+                    style={{
+                      flex: 1,
+                    }}
+                    onClick={() =>
+                      approveWork(r.id)
+                    }
+                    disabled={
+                      actionLoading === r.id
+                    }
+                  >
+                    {actionLoading === r.id
+                      ? "Processing..."
+                      : "✓ Approve Work"}
+                  </button>
+
+                  <button
+                    className="btn-outline"
+                    style={{
+                      flex: 1,
+                    }}
+                    onClick={() =>
+                      rejectWork(r.id)
+                    }
+                    disabled={
+                      actionLoading === r.id
+                    }
+                  >
+                    ✕ Reject Work
+                  </button>
+
+                </div>
+
+              </div>
+
+            )}
+
+          </div>
+
         ))
+
       )}
 
+      {/* REPORT MODAL */}
+
       {showModal && (
+
         <ReportModal
           profile={profile}
           onClose={() => setShowModal(false)}
+
           onSubmitted={async () => {
+
             setShowModal(false);
 
             setOk(
@@ -299,9 +522,12 @@ export default function CitizenDashboard() {
             );
 
             await load();
+
           }}
         />
+
       )}
+
     </>
   );
 }
