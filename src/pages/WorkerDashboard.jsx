@@ -129,201 +129,416 @@ export default function WorkerDashboard() {
     (r) => r.status === "completed"
   );
 
+  const assignedCount = reports.filter(
+    (r) => r.status === "assigned"
+  ).length;
+
+  const inProgressCount = reports.filter(
+    (r) =>
+      r.status === "in_progress" ||
+      r.status === "reopened"
+  ).length;
+
+  const firstName =
+    profile?.full_name?.split(" ")[0] ||
+    profile?.name?.split(" ")[0] ||
+    "Worker";
+
   return (
-    <>
-      {/* HEADER */}
+    <div className="worker-dashboard">
 
-      <div className="section-head">
-        <h2>Your Tasks</h2>
-      </div>
+      {/* ================= HERO ================= */}
 
+      <div className="worker-hero">
 
-      {/* STATISTICS */}
+        <div className="worker-hero-content">
 
-      <div className="stat-row">
-
-        <div className="stat">
-          <div className="num">
-            {active.length}
+          <div className="worker-badge">
+            👷 SmartSwachh Worker
           </div>
 
-          <div className="label">
-            Active
+          <h1>
+            Ready to make a difference,
+            <br />
+            {firstName}? 💪
+          </h1>
+
+          <p>
+            You have <strong>{active.length}</strong> active
+            task{active.length !== 1 ? "s" : ""}.
+            Every completed task helps build a cleaner city.
+          </p>
+
+          <div className="worker-hero-info">
+
+            <div>
+              <span>📋</span>
+              {assignedCount} New Tasks
+            </div>
+
+            <div>
+              <span>🚧</span>
+              {inProgressCount} In Progress
+            </div>
+
           </div>
+
         </div>
 
 
-        <div className="stat">
-          <div className="num">
-            {done.length}
+        <div className="worker-hero-visual">
+
+          <div className="worker-visual-main">
+            👷
           </div>
 
-          <div className="label">
-            Completed
+          <div className="worker-float float-1">
+            ♻️
           </div>
+
+          <div className="worker-float float-2">
+            📍
+          </div>
+
+          <div className="worker-float float-3">
+            ✓
+          </div>
+
         </div>
 
       </div>
 
 
-      {/* SUCCESS MESSAGE */}
+      {/* ================= STATISTICS ================= */}
+
+      <div className="worker-stats-grid">
+
+        <div className="worker-stat-card">
+
+          <div className="worker-stat-icon tasks">
+            📋
+          </div>
+
+          <div>
+
+            <div className="worker-stat-number">
+              {reports.length}
+            </div>
+
+            <div className="worker-stat-label">
+              Total Tasks
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div className="worker-stat-card">
+
+          <div className="worker-stat-icon active">
+            🚧
+          </div>
+
+          <div>
+
+            <div className="worker-stat-number">
+              {active.length}
+            </div>
+
+            <div className="worker-stat-label">
+              Active Tasks
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div className="worker-stat-card">
+
+          <div className="worker-stat-icon complete">
+            ✓
+          </div>
+
+          <div>
+
+            <div className="worker-stat-number">
+              {done.length}
+            </div>
+
+            <div className="worker-stat-label">
+              Completed
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ================= SUCCESS MESSAGE ================= */}
 
       {ok && (
-        <div className="msg ok">
+
+        <div className="modern-message success-message">
+          <span>✓</span>
           {ok}
         </div>
+
       )}
 
 
-      {/* ACTIVE TASKS */}
+      {/* ================= ACTIVE TASK HEADER ================= */}
+
+      <div className="worker-section-header">
+
+        <div>
+
+          <div className="section-small-title">
+            WORK QUEUE
+          </div>
+
+          <h2>
+            Active Tasks
+          </h2>
+
+          <p>
+            Manage your assigned tasks and update
+            their progress.
+          </p>
+
+        </div>
+
+
+        <div className="task-count-badge">
+          {active.length} Active
+        </div>
+
+      </div>
+
+
+      {/* ================= ACTIVE TASKS ================= */}
 
       {active.length === 0 ? (
 
-        <div className="empty">
-          No tasks assigned right now.
+        <div className="worker-empty">
+
+          <div className="worker-empty-icon">
+            🎉
+          </div>
+
+          <h3>
+            You're all caught up!
+          </h3>
+
+          <p>
+            There are no active tasks assigned
+            to you right now.
+          </p>
+
         </div>
 
       ) : (
 
-        active.map((r) => (
+        <div className="worker-task-list">
 
-          <ReportCard
-            key={r.id}
-            report={r}
+          {active.map((r) => (
 
-            rightSlot={
+            <div
+              key={r.id}
+              className="worker-task-wrapper"
+            >
 
-              <div className="report-actions">
+              <ReportCard
+                report={r}
 
+                rightSlot={
 
-                {/* 📍 VIEW LOCATION */}
-
-                <button
-                  className="btn-outline btn-sm"
-                  onClick={() => viewLocation(r)}
-                >
-                  📍 View Location
-                </button>
+                  <div className="worker-actions">
 
 
-                {/* 🧭 NAVIGATE */}
+                    {/* LOCATION ACTIONS */}
 
-                <button
-                  className="btn-outline btn-sm"
-                  onClick={() =>
-                    startNavigation(r)
-                  }
-                >
-                  🧭 Navigate
-                </button>
+                    <div className="worker-location-actions">
 
-
-                {/* ASSIGNED */}
-
-                {r.status === "assigned" && (
-
-                  <button
-                    className="btn-outline btn-sm"
-                    onClick={() =>
-                      markInProgress(r.id)
-                    }
-                  >
-                    Start Work
-                  </button>
-
-                )}
+                      <button
+                        className="worker-action-btn"
+                        onClick={() =>
+                          viewLocation(r)
+                        }
+                      >
+                        📍
+                        <span>
+                          Location
+                        </span>
+                      </button>
 
 
-                {/* IN PROGRESS / REOPENED */}
+                      <button
+                        className="worker-action-btn"
+                        onClick={() =>
+                          startNavigation(r)
+                        }
+                      >
+                        🧭
+                        <span>
+                          Navigate
+                        </span>
+                      </button>
 
-                {(r.status === "in_progress" ||
-                  r.status === "reopened") && (
-
-                  <button
-                    className="btn btn-sm"
-                    onClick={() =>
-                      setCompleteTarget(r.id)
-                    }
-                  >
-                    📸 Send for Approval
-                  </button>
-
-                )}
+                    </div>
 
 
-                {/* PENDING APPROVAL */}
+                    {/* ASSIGNED */}
 
-                {r.status === "pending_approval" && (
+                    {r.status === "assigned" && (
 
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: "var(--ink-soft)",
-                      padding: "6px 0",
-                    }}
-                  >
-                    ⏳ Waiting for citizen approval
+                      <button
+                        className="worker-primary-action"
+                        onClick={() =>
+                          markInProgress(r.id)
+                        }
+                      >
+                        ▶ Start Work
+                      </button>
+
+                    )}
+
+
+                    {/* IN PROGRESS / REOPENED */}
+
+                    {(r.status === "in_progress" ||
+                      r.status === "reopened") && (
+
+                      <button
+                        className="worker-primary-action"
+                        onClick={() =>
+                          setCompleteTarget(r.id)
+                        }
+                      >
+                        📸 Send for Approval
+                      </button>
+
+                    )}
+
+
+                    {/* PENDING APPROVAL */}
+
+                    {r.status ===
+                      "pending_approval" && (
+
+                      <div className="worker-waiting">
+
+                        <span>
+                          ⏳
+                        </span>
+
+                        <div>
+
+                          <strong>
+                            Awaiting Citizen Approval
+                          </strong>
+
+                          <small>
+                            The citizen is reviewing
+                            your completed work.
+                          </small>
+
+                        </div>
+
+                      </div>
+
+                    )}
+
+
+                    {/* APPROVED */}
+
+                    {r.status === "approved" && (
+
+                      <button
+                        className="worker-primary-action verify-action"
+                        onClick={() =>
+                          setVerifyTarget(r.id)
+                        }
+                      >
+                        🔐 Verify & Complete
+                      </button>
+
+                    )}
+
                   </div>
 
-                )}
+                }
+              />
 
-
-                {/* APPROVED */}
-
-                {r.status === "approved" && (
-
-                  <button
-                    className="btn btn-sm"
-                    onClick={() =>
-                      setVerifyTarget(r.id)
-                    }
-                  >
-                    🔐 Verify & Complete
-                  </button>
-
-                )}
-
-              </div>
-
-            }
-          />
-
-        ))
-
-      )}
-
-
-      {/* HISTORY */}
-
-      {done.length > 0 && (
-
-        <>
-
-          <h2
-            style={{
-              fontSize: 16,
-              marginTop: 26,
-            }}
-          >
-            History
-          </h2>
-
-
-          {done.map((r) => (
-
-            <ReportCard
-              key={r.id}
-              report={r}
-            />
+            </div>
 
           ))}
 
-        </>
+        </div>
 
       )}
 
 
-      {/* COMPLETE MODAL */}
+      {/* ================= HISTORY ================= */}
+
+      {done.length > 0 && (
+
+        <div className="worker-history">
+
+          <div className="worker-section-header history-header">
+
+            <div>
+
+              <div className="section-small-title">
+                PERFORMANCE
+              </div>
+
+              <h2>
+                Completed Tasks
+              </h2>
+
+              <p>
+                A record of successfully completed
+                cleaning tasks.
+              </p>
+
+            </div>
+
+            <div className="task-count-badge completed-badge">
+              ✓ {done.length} Completed
+            </div>
+
+          </div>
+
+
+          <div className="worker-task-list">
+
+            {done.map((r) => (
+
+              <div
+                key={r.id}
+                className="worker-task-wrapper completed-task"
+              >
+
+                <ReportCard
+                  report={r}
+                />
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ================= COMPLETE MODAL ================= */}
 
       {completeTarget && (
 
@@ -351,7 +566,7 @@ export default function WorkerDashboard() {
       )}
 
 
-      {/* VERIFY MODAL */}
+      {/* ================= VERIFY MODAL ================= */}
 
       {verifyTarget && (
 
@@ -377,6 +592,6 @@ export default function WorkerDashboard() {
 
       )}
 
-    </>
+    </div>
   );
 }

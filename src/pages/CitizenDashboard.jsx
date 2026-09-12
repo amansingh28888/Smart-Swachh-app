@@ -15,8 +15,6 @@ export default function CitizenDashboard() {
 
   const [err, setErr] = useState("");
   const [ok, setOk] = useState("");
-
-  // Approval loading state
   const [actionLoading, setActionLoading] = useState(null);
 
   async function load() {
@@ -196,322 +194,544 @@ export default function CitizenDashboard() {
   // ===============================
 
   const activeCount = reports.filter(
-    (r) => r.status !== "completed"
+    (r) =>
+      r.status !== "completed" &&
+      r.status !== "approved"
   ).length;
 
   const doneCount = reports.filter(
-    (r) => r.status === "completed"
+    (r) =>
+      r.status === "completed" ||
+      r.status === "approved"
   ).length;
+
+  const firstName =
+    profile?.full_name?.split(" ")[0] ||
+    profile?.name?.split(" ")[0] ||
+    "Citizen";
 
   // ===============================
   // UI
   // ===============================
 
   return (
-    <>
-      {/* POINTS BANNER */}
+    <div className="citizen-dashboard">
 
-      <div className="points-banner">
-        <div>
-          <div className="amt">
-            {profile.points} pts
+      {/* ================= HERO ================= */}
+
+      <div className="citizen-hero">
+
+        <div className="hero-content">
+
+          <div className="hero-badge">
+            ♻️ Smart Citizen
           </div>
 
-          <div className="sub">
-            ≈ ₹
-            {(
-              profile.points *
-              CONFIG.POINTS_TO_INR_RATE
-            ).toFixed(2)}
+          <h1>
+            Welcome back, {firstName}! 👋
+          </h1>
 
-            {" · "}
+          <p>
+            Help keep your city clean. Report waste,
+            track progress and earn rewards.
+          </p>
 
-            withdraw {CONFIG.MIN_WITHDRAW_POINTS}+ points anytime
-          </div>
+          <button
+            className="hero-report-btn"
+            onClick={() => setShowModal(true)}
+          >
+            <span>＋</span>
+            Report a Problem
+          </button>
+
         </div>
 
-        <button
-          className="btn-outline"
-          style={{
-            borderColor: "#fff",
-            color: "#fff",
-          }}
-          onClick={() => setShowWithdraw((s) => !s)}
-        >
-          Withdraw
-        </button>
-      </div>
+        <div className="hero-illustration">
 
-      {/* REPORT HEADER */}
-
-      <div className="section-head">
-        <h2>Your Reports</h2>
-
-        <button
-          className="btn"
-          onClick={() => setShowModal(true)}
-        >
-          + Report a Problem
-        </button>
-      </div>
-
-      {/* STATISTICS */}
-
-      <div className="stat-row">
-
-        <div className="stat">
-          <div className="num">
-            {reports.length}
+          <div className="eco-circle circle-1">
+            ♻️
           </div>
 
-          <div className="label">
-            Total Reports
-          </div>
-        </div>
-
-        <div className="stat">
-          <div className="num">
-            {activeCount}
+          <div className="eco-circle circle-2">
+            🌱
           </div>
 
-          <div className="label">
-            In Progress
-          </div>
-        </div>
-
-        <div className="stat">
-          <div className="num">
-            {doneCount}
+          <div className="eco-circle circle-3">
+            🏙️
           </div>
 
-          <div className="label">
-            Resolved
-          </div>
         </div>
 
       </div>
 
-      {/* ERROR */}
+
+      {/* ================= POINTS + STATS ================= */}
+
+      <div className="dashboard-top-grid">
+
+        {/* WALLET */}
+
+        <div className="modern-wallet">
+
+          <div className="wallet-top">
+
+            <div>
+
+              <div className="wallet-label">
+                💰 SmartSwachh Rewards
+              </div>
+
+              <div className="wallet-points">
+                {profile.points || 0}
+                <span> pts</span>
+              </div>
+
+            </div>
+
+            <div className="wallet-icon">
+              🪙
+            </div>
+
+          </div>
+
+          <div className="wallet-bottom">
+
+            <div>
+
+              <div className="wallet-value">
+                ≈ ₹
+                {(
+                  (profile.points || 0) *
+                  CONFIG.POINTS_TO_INR_RATE
+                ).toFixed(2)}
+              </div>
+
+              <div className="wallet-info">
+                Minimum withdrawal:
+                {" "}
+                {CONFIG.MIN_WITHDRAW_POINTS} points
+              </div>
+
+            </div>
+
+            <button
+              className="wallet-btn"
+              onClick={() =>
+                setShowWithdraw((s) => !s)
+              }
+            >
+              Withdraw →
+            </button>
+
+          </div>
+
+        </div>
+
+
+        {/* QUICK STATS */}
+
+        <div className="modern-stats">
+
+          <div className="modern-stat-card">
+
+            <div className="stat-icon total">
+              📋
+            </div>
+
+            <div>
+
+              <div className="modern-stat-number">
+                {reports.length}
+              </div>
+
+              <div className="modern-stat-label">
+                Total Reports
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="modern-stat-card">
+
+            <div className="stat-icon progress">
+              ⏳
+            </div>
+
+            <div>
+
+              <div className="modern-stat-number">
+                {activeCount}
+              </div>
+
+              <div className="modern-stat-label">
+                Active Reports
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="modern-stat-card">
+
+            <div className="stat-icon resolved">
+              ✓
+            </div>
+
+            <div>
+
+              <div className="modern-stat-number">
+                {doneCount}
+              </div>
+
+              <div className="modern-stat-label">
+                Resolved
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ================= MESSAGES ================= */}
 
       {err && (
-        <div className="msg error">
+
+        <div className="modern-message error-message">
+          <span>⚠️</span>
           {err}
         </div>
-      )}
 
-      {/* SUCCESS */}
+      )}
 
       {ok && (
-        <div className="msg ok">
+
+        <div className="modern-message success-message">
+          <span>✓</span>
           {ok}
         </div>
+
       )}
 
-      {/* WITHDRAW */}
+
+      {/* ================= WITHDRAW ================= */}
 
       {showWithdraw && (
-        <div
-          className="auth-card"
-          style={{ marginBottom: 20 }}
-        >
 
-          <h3
-            style={{
-              marginTop: 0,
-              fontSize: 15,
-            }}
-          >
-            Request a Withdrawal
-          </h3>
+        <div className="withdraw-panel">
+
+          <div className="withdraw-header">
+
+            <div>
+
+              <div className="panel-icon">
+                💸
+              </div>
+
+              <div>
+
+                <h3>
+                  Redeem Your Points
+                </h3>
+
+                <p>
+                  Convert your SmartSwachh points
+                  into rewards.
+                </p>
+
+              </div>
+
+            </div>
+
+            <button
+              className="close-panel"
+              onClick={() =>
+                setShowWithdraw(false)
+              }
+            >
+              ×
+            </button>
+
+          </div>
+
 
           <form onSubmit={requestWithdraw}>
 
-            <div className="field">
+            <div className="withdraw-form-row">
 
-              <label>
-                Points to redeem (min{" "}
-                {CONFIG.MIN_WITHDRAW_POINTS})
-              </label>
+              <div className="field withdraw-field">
 
-              <input
-                name="points"
-                type="number"
-                min={CONFIG.MIN_WITHDRAW_POINTS}
-                step="1"
-                required
-              />
+                <label>
+                  Points to Redeem
+                </label>
+
+                <input
+                  name="points"
+                  type="number"
+                  min={CONFIG.MIN_WITHDRAW_POINTS}
+                  step="1"
+                  placeholder={`Minimum ${CONFIG.MIN_WITHDRAW_POINTS} points`}
+                  required
+                />
+
+              </div>
+
+
+              <button className="withdraw-submit-btn">
+
+                💰 Submit Request
+
+              </button>
 
             </div>
-
-            <button className="btn btn-sm">
-              Submit Request
-            </button>
 
           </form>
 
+
+          {/* WITHDRAWAL HISTORY */}
+
           {withdrawals.length > 0 && (
-            <div style={{ marginTop: 14 }}>
 
-              {withdrawals.map((w) => (
+            <div className="withdraw-history">
 
-                <div
-                  key={w.id}
-                  style={{
-                    fontSize: 13,
-                    padding: "6px 0",
-                    borderTop:
-                      "1px solid var(--line)",
-                    display: "flex",
-                    justifyContent:
-                      "space-between",
-                  }}
-                >
+              <h4>
+                Recent Withdrawal Requests
+              </h4>
 
-                  <span>
-                    {w.points} pts → ₹{w.amount_inr}
-                  </span>
+              <div className="withdraw-list">
 
-                  <span
-                    className={`pill ${
-                      w.status === "approved" ||
-                      w.status === "paid"
-                        ? "completed"
-                        : w.status === "rejected"
-                        ? "rejected"
-                        : "pending"
-                    }`}
+                {withdrawals.map((w) => (
+
+                  <div
+                    key={w.id}
+                    className="withdraw-item"
                   >
-                    {w.status}
-                  </span>
 
-                </div>
+                    <div className="withdraw-left">
 
-              ))}
+                      <div className="withdraw-mini-icon">
+                        ₹
+                      </div>
+
+                      <div>
+
+                        <strong>
+                          {w.points} points
+                        </strong>
+
+                        <span>
+                          Reward value ₹{w.amount_inr}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+
+                    <span
+                      className={`pill ${
+                        w.status === "approved" ||
+                        w.status === "paid"
+                          ? "completed"
+                          : w.status === "rejected"
+                          ? "rejected"
+                          : "pending"
+                      }`}
+                    >
+                      {w.status}
+                    </span>
+
+                  </div>
+
+                ))}
+
+              </div>
 
             </div>
+
           )}
 
         </div>
+
       )}
 
-      {/* REPORTS */}
+
+      {/* ================= REPORTS HEADER ================= */}
+
+      <div className="reports-section-header">
+
+        <div>
+
+          <div className="section-small-title">
+            ACTIVITY
+          </div>
+
+          <h2>
+            Your Reports
+          </h2>
+
+          <p>
+            Track the progress of all waste reports
+            submitted by you.
+          </p>
+
+        </div>
+
+
+        <button
+          className="secondary-report-btn"
+          onClick={() =>
+            setShowModal(true)
+          }
+        >
+          ＋ New Report
+        </button>
+
+      </div>
+
+
+      {/* ================= REPORTS ================= */}
 
       {reports.length === 0 ? (
 
-        <div className="empty">
-          No reports yet. Spotted some waste on your street?
-          Tap "Report a problem".
+        <div className="modern-empty-state">
+
+          <div className="empty-icon">
+            ♻️
+          </div>
+
+          <h3>
+            No reports yet
+          </h3>
+
+          <p>
+            Spotted waste or a cleanliness issue?
+            Help your community by reporting it.
+          </p>
+
+          <button
+            className="btn"
+            onClick={() =>
+              setShowModal(true)
+            }
+          >
+            Report Your First Problem
+          </button>
+
         </div>
 
       ) : (
 
-        reports.map((r) => (
+        <div className="reports-list">
 
-          <div
-            key={r.id}
-            style={{
-              marginBottom: 16,
-            }}
-          >
+          {reports.map((r) => (
 
-            <ReportCard
-              report={r}
-              showVerificationCode={true}
-            />
+            <div
+              key={r.id}
+              className="report-wrapper"
+            >
 
-            {/* CITIZEN APPROVAL */}
+              <ReportCard
+                report={r}
+                showVerificationCode={true}
+              />
 
-            {r.status === "pending_approval" && (
 
-              <div
-                style={{
-                  padding: 14,
-                  marginTop: -8,
-                  borderRadius: "0 0 12px 12px",
-                  border: "1px solid var(--line)",
-                  borderTop: "none",
-                  background: "#f8fbff",
-                }}
-              >
+              {/* CITIZEN APPROVAL */}
 
-                <div
-                  style={{
-                    fontWeight: 700,
-                    marginBottom: 6,
-                  }}
-                >
-                  📸 Review Completed Work
-                </div>
+              {r.status ===
+                "pending_approval" && (
 
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: "var(--ink-soft)",
-                    marginTop: 0,
-                  }}
-                >
-                  Please check the completion photo. Are you
-                  satisfied with the cleaning work?
-                </p>
+                <div className="approval-card">
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 10,
-                  }}
-                >
+                  <div className="approval-top">
 
-                  <button
-                    className="btn"
-                    style={{
-                      flex: 1,
-                    }}
-                    onClick={() =>
-                      approveWork(r.id)
-                    }
-                    disabled={
-                      actionLoading === r.id
-                    }
-                  >
-                    {actionLoading === r.id
-                      ? "Processing..."
-                      : "✓ Approve Work"}
-                  </button>
+                    <div className="approval-icon">
+                      📸
+                    </div>
 
-                  <button
-                    className="btn-outline"
-                    style={{
-                      flex: 1,
-                    }}
-                    onClick={() =>
-                      rejectWork(r.id)
-                    }
-                    disabled={
-                      actionLoading === r.id
-                    }
-                  >
-                    ✕ Reject Work
-                  </button>
+                    <div>
+
+                      <h3>
+                        Review Completed Work
+                      </h3>
+
+                      <p>
+                        Please check the completion
+                        photo and confirm whether
+                        the cleaning work has been
+                        completed properly.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="approval-actions">
+
+                    <button
+                      className="approve-btn"
+                      onClick={() =>
+                        approveWork(r.id)
+                      }
+                      disabled={
+                        actionLoading === r.id
+                      }
+                    >
+
+                      {actionLoading === r.id
+                        ? "Processing..."
+                        : "✓ Approve Work"}
+
+                    </button>
+
+
+                    <button
+                      className="reject-btn"
+                      onClick={() =>
+                        rejectWork(r.id)
+                      }
+                      disabled={
+                        actionLoading === r.id
+                      }
+                    >
+
+                      ✕ Reject Work
+
+                    </button>
+
+                  </div>
 
                 </div>
 
-              </div>
+              )}
 
-            )}
+            </div>
 
-          </div>
+          ))}
 
-        ))
+        </div>
 
       )}
 
-      {/* REPORT MODAL */}
+
+      {/* ================= REPORT MODAL ================= */}
 
       {showModal && (
 
         <ReportModal
           profile={profile}
-          onClose={() => setShowModal(false)}
+
+          onClose={() =>
+            setShowModal(false)
+          }
 
           onSubmitted={async () => {
 
@@ -528,6 +748,6 @@ export default function CitizenDashboard() {
 
       )}
 
-    </>
+    </div>
   );
 }
