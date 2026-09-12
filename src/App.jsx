@@ -87,6 +87,21 @@ const IconBell = () => (
   </svg>
 );
 
+const IconMenu = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+
+const IconClose = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
 // ─── Role Config ───────────────────────────────────────
 
 const ROLE_LABEL = { citizen: "Citizen", worker: "Worker", admin: "Admin" };
@@ -121,6 +136,7 @@ function Shell() {
   const [activeNav, setActiveNav] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(2);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   if (showLanding) {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;
@@ -141,21 +157,41 @@ function Shell() {
   return (
     <div id="app-root">
 
+      {/* ═══ MOBILE BACKDROP ═══ */}
+      <div
+        className={`sidebar-backdrop ${mobileSidebarOpen ? "active" : ""}`}
+        onClick={() => setMobileSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* ═══ SIDEBAR ═══ */}
-      <aside className="app-sidebar">
+      <aside className={`app-sidebar ${mobileSidebarOpen ? "mobile-open" : ""}`}>
 
         {/* Logo */}
-        <div
-          className="sidebar-logo"
-          onClick={() => setShowLanding(true)}
-          style={{ cursor: "pointer" }}
-          title="Back to Home"
-        >
-          <div className="sidebar-logo-icon"><IconRecycle /></div>
-          <div>
-            <div className="sidebar-logo-name">SmartSwachh</div>
-            <div className="sidebar-logo-sub">Waste Management</div>
+        <div className="sidebar-logo">
+          <div
+            className="sidebar-logo-brand"
+            onClick={() => {
+              setShowLanding(true);
+              setMobileSidebarOpen(false);
+            }}
+            style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", flex: 1 }}
+            title="Back to Home"
+          >
+            <div className="sidebar-logo-icon"><IconRecycle /></div>
+            <div>
+              <div className="sidebar-logo-name">SmartSwachh</div>
+              <div className="sidebar-logo-sub">Waste Management</div>
+            </div>
           </div>
+          <button
+            className="mobile-sidebar-close"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-label="Close menu"
+            title="Close menu"
+          >
+            <IconClose />
+          </button>
         </div>
 
         {/* User */}
@@ -174,7 +210,10 @@ function Shell() {
             <button
               key={i}
               className={`sidebar-nav-item ${activeNav === i ? "active" : ""}`}
-              onClick={() => setActiveNav(i)}
+              onClick={() => {
+                setActiveNav(i);
+                setMobileSidebarOpen(false);
+              }}
             >
               {item.icon}
               {item.label}
@@ -198,12 +237,22 @@ function Shell() {
 
         {/* Top bar */}
         <div className="topbar">
-          <div>
-            <div className="topbar-title">
-              {navItems[activeNav]?.label ? `${ROLE_LABEL[profile.role]} · ${navItems[activeNav].label}` : `${ROLE_LABEL[profile.role]} Dashboard`}
-            </div>
-            <div className="topbar-subtitle">
-              Here's what's happening in your city today
+          <div className="topbar-left">
+            <button
+              className="mobile-menu-btn"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
+              title="Open menu"
+            >
+              <IconMenu />
+            </button>
+            <div className="topbar-heading">
+              <div className="topbar-title">
+                {navItems[activeNav]?.label ? `${ROLE_LABEL[profile.role]} · ${navItems[activeNav].label}` : `${ROLE_LABEL[profile.role]} Dashboard`}
+              </div>
+              <div className="topbar-subtitle">
+                Here's what's happening in your city today
+              </div>
             </div>
           </div>
 
@@ -222,7 +271,10 @@ function Shell() {
               <NotificationDropdown
                 profile={profile}
                 onClose={() => setShowNotifications(false)}
-                onNavigate={(idx) => setActiveNav(idx)}
+                onNavigate={(idx) => {
+                  setActiveNav(idx);
+                  setMobileSidebarOpen(false);
+                }}
                 onUnreadChange={(count) => setUnreadCount(count)}
               />
             )}
@@ -237,6 +289,24 @@ function Shell() {
           {profile.role === "worker"  && <WorkerDashboard activeNav={activeNav} setActiveNav={setActiveNav} />}
           {profile.role === "admin"   && <AdminDashboard activeNav={activeNav} setActiveNav={setActiveNav} />}
         </main>
+
+        {/* ═══ MOBILE BOTTOM NAVIGATION ═══ */}
+        <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+          {navItems.map((item, i) => (
+            <button
+              key={i}
+              className={`mobile-bottom-item ${activeNav === i ? "active" : ""}`}
+              onClick={() => {
+                setActiveNav(i);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              title={item.label}
+            >
+              <div className="mobile-bottom-icon">{item.icon}</div>
+              <span className="mobile-bottom-label">{item.label}</span>
+            </button>
+          ))}
+        </nav>
 
       </div>
 
