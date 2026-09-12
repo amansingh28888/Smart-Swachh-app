@@ -15,6 +15,7 @@ import AuthPage from "./pages/AuthPage";
 import CitizenDashboard from "./pages/CitizenDashboard";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import NotificationDropdown from "./components/NotificationDropdown";
 
 // ─── Sidebar SVG icons ─────────────────────────────────
 
@@ -118,6 +119,8 @@ function Shell() {
   const { profile, signOut } = useAuth();
   const [showLanding, setShowLanding] = useState(false);
   const [activeNav, setActiveNav] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(2);
 
   if (showLanding) {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;
@@ -206,9 +209,24 @@ function Shell() {
 
           <div className="topbar-right">
             <div className="topbar-date">{today}</div>
-            <button className="topbar-bell" title="Notifications">
+            <button
+              className="topbar-bell"
+              title="Notifications"
+              onClick={() => setShowNotifications(!showNotifications)}
+            >
               <IconBell />
+              {unreadCount > 0 && <span className="topbar-bell-badge">{unreadCount}</span>}
             </button>
+
+            {showNotifications && (
+              <NotificationDropdown
+                profile={profile}
+                onClose={() => setShowNotifications(false)}
+                onNavigate={(idx) => setActiveNav(idx)}
+                onUnreadChange={(count) => setUnreadCount(count)}
+              />
+            )}
+
             <span className="role-pill">{ROLE_LABEL[profile.role]}</span>
           </div>
         </div>
