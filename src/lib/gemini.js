@@ -129,79 +129,125 @@ You are helpful, friendly and environmentally conscious.
 `;
 
 
-export async function askWasteAssistant(question) {
+// Local intelligent fallback engine when offline or API key isn't provided
+const getLocalWasteAdvice = (query) => {
+  const q = query.toLowerCase();
 
-  if (!CONFIG.GEMINI_API_KEY) {
-    throw new Error(
-      "Gemini API key is not set"
-    );
+  if (q.includes("plastic") || q.includes("bottle") || q.includes("wrapper") || q.includes("polythene")) {
+    return `### 🔵 Dry Waste / Recyclable (Blue Bin)
+- **Bottles & Containers**: Rinse thoroughly, crush, and place in the **Blue Bin** 🔵.
+- **Single-use plastics**: Avoid where possible. Thin polythene bags should be bundled clean for municipal plastic recycling.
+- **Milk Packets**: Wash with a splash of water, dry, and put into dry recyclables.
+💡 *Tip: Clean, dry plastic has 10x higher chance of being mechanically recycled!*`;
   }
 
+  if (q.includes("wet") || q.includes("food") || q.includes("kitchen") || q.includes("organic") || q.includes("peel") || q.includes("vegetable") || q.includes("fruit")) {
+    return `### 🟢 Wet / Biodegradable Waste (Green Bin)
+- **Kitchen Scraps**: Vegetable and fruit peels, tea leaves, eggshells, and leftover cooked food go into the **Green Bin** 🟢.
+- **Garden Waste**: Fallen leaves, grass clippings, and small twigs can also be composted.
+- **Important**: Do NOT throw plastics, wrappers, or foil inside the green bin.
+🌱 *Tip: Starting a home compost pit turns this waste into nutrient-rich organic fertilizer in 4-6 weeks!*`;
+  }
+
+  if (q.includes("medical") || q.includes("syringe") || q.includes("needle") || q.includes("medicine") || q.includes("bandage") || q.includes("hazard") || q.includes("chemical") || q.includes("paint")) {
+    return `### 🔴 Hazardous & Medical Waste (Red Bin)
+- **Medical Sharps**: Used needles & syringes must be placed in puncture-proof containers and handed over for biomedical disposal in the **Red Bin** 🔴.
+- **Expired Medicines**: Never flush pills into sinks or toilets! Return them to pharmacies with medicine take-back or mark as domestic hazardous.
+- **Paints & Insecticides**: Must be handed over separately to prevent ground and water toxicity.
+⚠️ *Precaution: Always wrap contaminated dressings safely to protect our sanitation heroes.*`;
+  }
+
+  if (q.includes("e-waste") || q.includes("ewaste") || q.includes("phone") || q.includes("laptop") || q.includes("battery") || q.includes("charger") || q.includes("bulb") || q.includes("electronic")) {
+    return `### ⚡ Electronic Waste (E-Waste Facility)
+- **Batteries & Gadgets**: Batteries leak lithium, lead, and acid! Store them safely in a dry cardboard box.
+- **Old Phones & Chargers**: Hand them over at authorised municipal E-Waste collection centers or deposit kiosks.
+- **Fluorescent & LED Bulbs**: Contain sensitive circuitry and trace metals—deposit at certified e-waste bins.
+♻️ *Fact: 1 million recycled smartphones can recover over 35,000 lbs of copper and 770 lbs of silver!*`;
+  }
+
+  if (q.includes("report") || q.includes("complaint") || q.includes("how to report") || q.includes("app") || q.includes("smartswachh")) {
+    return `### 📸 How to Report Waste on SmartSwachh:
+1. Tap the **"Report Waste"** button on your Citizen Dashboard.
+2. Snap or upload a photo of the garbage pile.
+3. Our **AI Detection** instantly recognizes the waste type and suggests the proper bin!
+4. Confirm your GPS location and hit **Submit**.
+5. You can track municipal worker assignment in real-time until resolution! 🚚✨`;
+  }
+
+  if (q.includes("compost") || q.includes("khad")) {
+    return `### 🌿 Quick Home Composting Guide:
+1. **Layer Brown & Green**: Mix green waste (fruit peels, tea leaves) with brown waste (dry leaves, shredded cardboard).
+2. **Moisture Balance**: Keep it damp like a wrung-out sponge, but never dripping wet.
+3. **Aeration**: Stir once a week to let oxygen reach beneficial aerobic microbes.
+4. In 30–45 days, you'll have dark, earthy organic compost for your plants!`;
+  }
+
+  return `### ♻️ SmartSwachh Waste Segregation Guidelines:
+- 🟢 **Green Bin (Wet Waste)**: Kitchen leftovers, fruit peels, eggshells, fallen leaves.
+- 🔵 **Blue Bin (Dry Waste)**: Cardboard, paper, clean plastics, glass, metals.
+- 🔴 **Red Bin (Hazardous/Medical)**: Syringes, expired medicines, sanitary waste, chemical containers.
+- ⚡ **E-Waste**: Electronics, cables, batteries, and chargers.
+
+What specific item would you like to sort today? Just type the item name (e.g., *"pizza box"*, *"milk pouch"*, *"AA battery"*)!`;
+};
+
+export async function askWasteAssistant(question, history = []) {
+  if (!CONFIG.GEMINI_API_KEY) {
+    // Provide comprehensive intelligent fallback when API key is unconfigured
+    return getLocalWasteAdvice(question);
+  }
+
+  const historyContext = history.slice(-6).map(m => `${m.role === "user" ? "User" : "Assistant"}: ${m.text}`).join("\n");
 
   const body = {
-
     contents: [
       {
         parts: [
           {
             text: `${CHATBOT_PROMPT}
 
-User Question:
+Previous Conversation Context:
+${historyContext || "None"}
+
+Current User Question:
 ${question}
+
+Provide an engaging, helpful, and concise answer with Markdown headings and bullet points. Highlight the correct bin (🟢 Green Bin, 🔵 Blue Bin, 🔴 Red Bin, or ⚡ E-Waste) where applicable.
 
 Answer:`,
           },
         ],
       },
     ],
-
   };
-
 
   const url =
     `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
 
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
 
-  const resp = await fetch(url, {
+    if (!resp.ok) {
+      console.warn("Gemini API call returned non-OK, using intelligent fallback.");
+      return getLocalWasteAdvice(question);
+    }
 
-    method: "POST",
+    const data = await resp.json();
+    const answer = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    headers: {
-      "Content-Type": "application/json",
-    },
+    if (!answer) {
+      return getLocalWasteAdvice(question);
+    }
 
-    body: JSON.stringify(body),
-
-  });
-
-
-  if (!resp.ok) {
-
-    const t = await resp.text();
-
-    throw new Error(
-      "Gemini API error: " + t.slice(0, 200)
-    );
-
+    return answer.trim();
+  } catch (err) {
+    console.warn("Gemini API error, falling back to local waste intelligence:", err);
+    return getLocalWasteAdvice(question);
   }
-
-
-  const data = await resp.json();
-
-
-  const answer =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-
-  if (!answer) {
-
-    throw new Error(
-      "No response received from Gemini"
-    );
-
-  }
-
-
-  return answer.trim();
-
 }
