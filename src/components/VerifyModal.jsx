@@ -113,7 +113,7 @@ export default function VerifyModal({
           >
 
             <label>
-              🔐 SmartVerify Code
+              SmartVerify Code
             </label>
 
             <input

@@ -103,28 +103,23 @@ export default function CompleteModal({
         <form onSubmit={submit}>
 
           {/* AFTER PHOTO */}
-
-          <label
-            className="photo-drop"
-            htmlFor="cf-photo"
-          >
+          <label className="photo-drop" htmlFor="cf-photo">
             {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Cleaned location preview"
-              />
+              <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                <img
+                  src={previewUrl}
+                  alt="Cleaned location preview"
+                  className="clickable-image"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }}
+                />
+                <div style={{ position: "absolute", bottom: 8, right: 8, background: "rgba(0,0,0,0.7)", color: "#fff", padding: "4px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
+                  Tap to change photo
+                </div>
+              </div>
             ) : (
               <div>
-                📷
-                <br />
-
-                <span
-                  style={{
-                    fontSize: 13.5,
-                  }}
-                >
-                  Upload cleaned location photo
-                </span>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{margin:"0 auto 6px",display:"block",color:"var(--ink-muted)"}}><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                <span style={{ fontSize: 13.5 }}>Upload cleaned location photo</span>
               </div>
             )}
           </label>

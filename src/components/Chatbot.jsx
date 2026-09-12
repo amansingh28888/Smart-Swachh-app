@@ -8,8 +8,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState([
     {
       role: "bot",
-      text:
-        "Hi! 👋 I'm SmartSwachh AI Assistant. Ask me anything about waste disposal, recycling, segregation, or cleanliness! ♻️",
+      text: "Hello! I'm SmartSwachh AI Assistant. Ask me anything about waste disposal, recycling, segregation, or cleanliness.",
     },
   ]);
 
@@ -17,10 +16,10 @@ export default function Chatbot() {
   const [isTyping, setIsTyping] = useState(false);
 
   const quickQuestions = [
-    "♻️ How to dispose plastic?",
-    "🏥 What is medical waste?",
-    "🗑️ How to separate wet and dry waste?",
-    "💻 How to dispose e-waste?",
+    "How to dispose plastic?",
+    "What is medical waste?",
+    "How to separate wet and dry waste?",
+    "How to dispose e-waste?",
   ];
 
   const sendMessage = async (text = input) => {
@@ -28,7 +27,6 @@ export default function Chatbot() {
 
     const cleanText = text.trim();
 
-    // Add user message
     setMessages((prev) => [
       ...prev,
       {
@@ -41,7 +39,6 @@ export default function Chatbot() {
     setIsTyping(true);
 
     try {
-      // Ask Gemini AI
       const response = await askWasteAssistant(cleanText);
 
       setMessages((prev) => [
@@ -58,8 +55,7 @@ export default function Chatbot() {
         ...prev,
         {
           role: "bot",
-          text:
-            "⚠️ Sorry, I'm having trouble connecting to the AI service. Please try again.",
+          text: "Sorry, I'm having trouble connecting to the AI service. Please try again.",
         },
       ]);
     } finally {
@@ -75,7 +71,7 @@ export default function Chatbot() {
           {/* Header */}
           <div className="chatbot-header">
             <div>
-              <strong>🤖 SmartSwachh AI</strong>
+              <strong>SmartSwachh AI</strong>
               <p>AI Waste Management Assistant</p>
             </div>
 
@@ -83,7 +79,7 @@ export default function Chatbot() {
               onClick={() => setIsOpen(false)}
               aria-label="Close chatbot"
             >
-              ✕
+              ×
             </button>
           </div>
 
@@ -101,7 +97,7 @@ export default function Chatbot() {
 
             {isTyping && (
               <div className="typing">
-                🤖 SmartSwachh AI is thinking...
+                SmartSwachh AI is thinking...
               </div>
             )}
 
@@ -125,7 +121,7 @@ export default function Chatbot() {
 
             <input
               type="text"
-              placeholder="Ask about waste..."
+              placeholder="Ask about waste management..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -152,9 +148,14 @@ export default function Chatbot() {
       <button
         className="chatbot-button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Open chatbot"
+        aria-label="Open AI assistant"
+        id="chatbot-toggle"
       >
-        {isOpen ? "✕" : "💬"}
+        {isOpen ? "×" : (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        )}
       </button>
     </>
   );
