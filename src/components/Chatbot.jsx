@@ -44,7 +44,7 @@ const SUGGESTIONS = [
   { label: "🍌 Can I compost food scraps?", query: "How to separate wet kitchen waste and make organic compost?" },
   { label: "🔋 Where to dispose batteries?", query: "How to safely dispose expired electronic batteries and old chargers?" },
   { label: "💊 Expired medicine disposal?", query: "What is the proper way to dispose of expired medicines and syringes?" },
-  { label: "📸 How to report waste here?", query: "How do I report dirty spots or overflowing bins using the SmartSwachh app?" },
+  { label: "📸 How to report waste here?", query: "How do I report dirty spots or overflowing bins using the EcoNova app?" },
   { label: "💡 Random Eco Fact", query: "Tell me a fascinating fact about recycling and waste segregation." },
 ];
 

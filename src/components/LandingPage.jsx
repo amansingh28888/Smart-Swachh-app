@@ -146,11 +146,7 @@ export default function LandingPage({ onGetStarted }) {
         <div className="landing-container navbar-inner">
 
           <div className="landing-logo">
-            <div className="logo-mark"><IconRecycle s={18} /></div>
-            <div>
-              <div className="logo-name">SmartSwachh</div>
-              <div className="logo-tagline">Waste Management Platform</div>
-            </div>
+            <img src="/logo.png" alt="EcoNova Logo" style={{ height: "40px", objectFit: "contain" }} />
           </div>
 
           <div className="nav-links">
@@ -192,7 +188,7 @@ export default function LandingPage({ onGetStarted }) {
             </h1>
 
             <p className="hero-description">
-              SmartSwachh connects citizens, Artificial Intelligence and sanitation workers to make waste reporting, monitoring and cleanup smarter.
+              EcoNova connects citizens, Artificial Intelligence and sanitation workers to make waste reporting, monitoring and cleanup smarter.
             </p>
 
             <div className="hero-actions">
@@ -241,7 +237,7 @@ export default function LandingPage({ onGetStarted }) {
           <div className="hero-illustration-col">
 
             <div className="hero-illustration-img">
-              <img src="/hero-illustration.jpg" alt="SmartSwachh — Smart city waste management illustration" />
+              <img src="/hero-illustration.jpg" alt="EcoNova — Smart city waste management illustration" />
             </div>
 
             {/* Floating card */}
@@ -423,7 +419,7 @@ export default function LandingPage({ onGetStarted }) {
               <em>getting cleaner.</em>
             </h2>
             <p className="section-desc">
-              Every report, worker action and completed cleanup updates the SmartSwachh system in real time — giving you full visibility into city-wide sanitation.
+              Every report, worker action and completed cleanup updates the EcoNova system in real time — giving you full visibility into city-wide sanitation.
             </p>
             <button className="preview-cta-btn" onClick={onGetStarted} id="preview-explore-btn">
               Explore Dashboard <IconArrowRight s={16} />
@@ -542,7 +538,7 @@ export default function LandingPage({ onGetStarted }) {
             </h2>
 
             <p>
-              Join SmartSwachh and become part of a smarter, cleaner and greener future for your city.
+              Join EcoNova and become part of a smarter, cleaner and greener future for your city.
             </p>
 
             <button className="cta-btn" onClick={onGetStarted} id="cta-get-started-btn">
@@ -559,16 +555,13 @@ export default function LandingPage({ onGetStarted }) {
         <div className="landing-container footer-inner">
 
           <div className="footer-brand">
-            <div className="footer-logo-mark"><IconRecycle s={16} /></div>
-            <div>
-              <div className="footer-logo-name">SmartSwachh</div>
-              <div className="footer-tagline">Smarter Waste. Cleaner Cities. Greener Future.</div>
-            </div>
+            <img src="/logo.png" alt="EcoNova Logo" style={{ height: "40px", objectFit: "contain", marginBottom: "8px" }} />
+            <div className="footer-tagline">Smarter Waste. Cleaner Cities. Greener Future.</div>
           </div>
 
           <div className="footer-right">
             <div className="footer-platform">AI-Powered Waste Management Platform</div>
-            <div className="footer-copy">© 2026 SmartSwachh. All Rights Reserved.</div>
+            <div className="footer-copy">© 2026 EcoNova. All Rights Reserved.</div>
           </div>
 
         </div>

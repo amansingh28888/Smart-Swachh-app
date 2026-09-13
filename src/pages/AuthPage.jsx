@@ -101,13 +101,7 @@ export default function AuthPage() {
       <div className="auth-brand-panel">
 
         <div className="auth-brand-logo">
-          <div className="auth-brand-logo-icon">
-            <IconRecycle />
-          </div>
-          <div>
-            <div className="auth-brand-logo-name">SmartSwachh</div>
-            <div className="auth-brand-tagline">Waste Management Platform</div>
-          </div>
+          <img src="/logo.png" alt="EcoNova Logo" style={{ height: "60px", objectFit: "contain", marginBottom: "16px" }} />
         </div>
 
         <h2 className="auth-brand-heading">
@@ -142,7 +136,7 @@ export default function AuthPage() {
         <div className="auth-form-inner">
 
           <h2>{tab === "login" ? "Welcome back" : "Create an account"}</h2>
-          <p>{tab === "login" ? "Sign in to your SmartSwachh account." : "Join the smarter way to manage waste."}</p>
+          <p>{tab === "login" ? "Sign in to your EcoNova account." : "Join the smarter way to manage waste."}</p>
 
           {/* Tabs */}
           <div className="tabs">

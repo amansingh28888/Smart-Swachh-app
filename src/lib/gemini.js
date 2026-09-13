@@ -97,8 +97,8 @@ export async function analyzeWasteImage(file) {
 // ==========================================
 
 const CHATBOT_PROMPT = `
-You are SmartSwachh AI Assistant, an intelligent waste management assistant
-for SmartSwachh, an Indian smart waste management platform.
+You are EcoNova AI Assistant, an intelligent waste management assistant
+for EcoNova, an Indian smart waste management platform.
 
 Your role is to help citizens understand:
 
@@ -112,7 +112,7 @@ Your role is to help citizens understand:
 - Composting
 - Proper waste disposal
 - Cleanliness and sustainability
-- How to report waste using the SmartSwachh platform
+- How to report waste using the EcoNova platform
 
 Important rules:
 
@@ -166,7 +166,7 @@ const getLocalWasteAdvice = (query) => {
   }
 
   if (q.includes("report") || q.includes("complaint") || q.includes("how to report") || q.includes("app") || q.includes("smartswachh")) {
-    return `### 📸 How to Report Waste on SmartSwachh:
+    return `### 📸 How to Report Waste on EcoNova:
 1. Tap the **"Report Waste"** button on your Citizen Dashboard.
 2. Snap or upload a photo of the garbage pile.
 3. Our **AI Detection** instantly recognizes the waste type and suggests the proper bin!
@@ -182,7 +182,7 @@ const getLocalWasteAdvice = (query) => {
 4. In 30–45 days, you'll have dark, earthy organic compost for your plants!`;
   }
 
-  return `### ♻️ SmartSwachh Waste Segregation Guidelines:
+  return `### ♻️ EcoNova Waste Segregation Guidelines:
 - 🟢 **Green Bin (Wet Waste)**: Kitchen leftovers, fruit peels, eggshells, fallen leaves.
 - 🔵 **Blue Bin (Dry Waste)**: Cardboard, paper, clean plastics, glass, metals.
 - 🔴 **Red Bin (Hazardous/Medical)**: Syringes, expired medicines, sanitary waste, chemical containers.
@@ -267,7 +267,7 @@ export async function generatePredictiveInsights(reports) {
     `- Category: ${r.category}, Status: ${r.status}, Location: Lat ${r.location_lat?.toFixed(4)}, Lng ${r.location_lng?.toFixed(4)}`
   ).join("\n");
 
-  const prompt = `You are an AI Analytics engine for SmartSwachh waste management platform.
+  const prompt = `You are an AI Analytics engine for EcoNova waste management platform.
 Analyze the following active waste reports and provide a short, single-paragraph predictive insight (max 3 sentences) for the municipal admin. 
 Identify any critical clusters or patterns, and suggest an actionable priority.
 

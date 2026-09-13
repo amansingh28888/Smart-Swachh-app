@@ -180,11 +180,7 @@ function Shell() {
             style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", flex: 1 }}
             title="Back to Home"
           >
-            <div className="sidebar-logo-icon"><IconRecycle /></div>
-            <div>
-              <div className="sidebar-logo-name">SmartSwachh</div>
-              <div className="sidebar-logo-sub">Waste Management</div>
-            </div>
+            <img src="/logo.png" alt="EcoNova Logo" style={{ height: "40px", objectFit: "contain" }} />
           </div>
           <button
             className="mobile-sidebar-close"
@@ -406,7 +402,7 @@ function AppRouter() {
     return (
       <div className="center-page">
         <div style={{ width: 20, height: 20, border: "2.5px solid #E2EDE8", borderTopColor: "#1B5E37", borderRadius: "50%", animation: "spin .7s linear infinite" }}></div>
-        Loading SmartSwachh...
+        Loading EcoNova...
       </div>
     );
   }

@@ -326,7 +326,7 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
             <div className="modern-wallet">
               <div className="wallet-top">
                 <div>
-                  <div className="wallet-label">SmartSwachh Rewards</div>
+                  <div className="wallet-label">EcoNova Rewards</div>
                   <div className="wallet-points">{profile.points || 0}<span> pts</span></div>
                 </div>
                 <div className="wallet-icon"><IconWallet /></div>
@@ -671,7 +671,7 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
             <div className="chart-card">
               <div className="chart-card-title">Points Earned</div>
               <div style={{ fontSize: 32, fontWeight: 800, color: "var(--primary)" }}>{profile.points || 0} pts</div>
-              <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4 }}>Total SmartSwachh reward balance</div>
+              <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4 }}>Total EcoNova reward balance</div>
             </div>
 
             <div className="chart-card">
