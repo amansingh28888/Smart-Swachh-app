@@ -9,7 +9,7 @@ import {
   useAuth,
 } from "./context/AuthContext";
 
-import { isSupabaseConfigured } from "./supabaseClient";
+import { isSupabaseConfigured, supabase } from "./supabaseClient";
 
 import AuthPage from "./pages/AuthPage";
 import CitizenDashboard from "./pages/CitizenDashboard";
@@ -330,6 +330,71 @@ function SetupNeeded() {
   );
 }
 
+// ─── COMPLETE PROFILE ──────────────────────────────────────
+
+function CompleteProfile() {
+  const { profile, reloadProfile, signOut } = useAuth();
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!phone.trim()) return;
+    setLoading(true);
+    setError("");
+    try {
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ phone: phone.trim() })
+        .eq("id", profile.id);
+      
+      if (updateError) throw updateError;
+      
+      // Also update auth.users metadata so it doesn't get lost
+      await supabase.auth.updateUser({ data: { phone: phone.trim() } });
+      
+      await reloadProfile();
+    } catch (err) {
+      setError(err.message);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div className="auth-wrap">
+      <div className="auth-form-panel" style={{ width: "100%", maxWidth: 450, margin: "auto", borderRadius: 16 }}>
+        <div className="auth-form-inner">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <h2 style={{ margin: 0 }}>Complete Profile</h2>
+            <button onClick={signOut} style={{ background: 'none', border: 'none', color: 'var(--brand)', cursor: 'pointer', fontSize: 13, padding: 0 }}>Logout</button>
+          </div>
+          <p>Please provide your phone number to continue. This is required so we can verify cleanups via OTP.</p>
+          
+          {error && <div className="msg error">{error}</div>}
+          
+          <form onSubmit={handleSubmit} style={{ marginTop: 24 }}>
+            <div className="field">
+              <label>Phone number</label>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                placeholder="Enter your phone number"
+              />
+            </div>
+            <button className="btn btn-block" disabled={loading} style={{ marginTop: 24 }}>
+              {loading && <span className="spinner" />}
+              Save & Continue
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 // ─── APP ROUTER ────────────────────────────────────────
 
@@ -346,7 +411,10 @@ function AppRouter() {
     );
   }
 
-  if (session && profile) return <Shell />;
+  if (session && profile) {
+    if (!profile.phone) return <CompleteProfile />;
+    return <Shell />;
+  }
 
   if (!showAuth) {
     return <LandingPage onGetStarted={() => setShowAuth(true)} />;

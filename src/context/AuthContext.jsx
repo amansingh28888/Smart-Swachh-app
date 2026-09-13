@@ -48,6 +48,7 @@ export function AuthProvider({ children }) {
               email: u.email || "",
               role: role,
               points: 0,
+              phone: u.user_metadata?.phone || null,
             };
             const { data: createdProfile, error: insertError } = await supabase
               .from("profiles")
@@ -67,6 +68,27 @@ export function AuthProvider({ children }) {
       console.error("Profile load error:", error);
       setProfile(null);
       return null;
+    }
+
+    // Sync phone from user_metadata if it was lost during trigger creation
+    if (data && !data.phone) {
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user?.user_metadata?.phone) {
+          const { data: updated } = await supabase
+            .from("profiles")
+            .update({ phone: userData.user.user_metadata.phone })
+            .eq("id", userId)
+            .select()
+            .single();
+          if (updated) {
+            setProfile(updated);
+            return updated;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to sync phone from metadata", err);
+      }
     }
 
     setProfile(data);
@@ -123,7 +145,7 @@ export function AuthProvider({ children }) {
   }, [loadProfile]);
 
   // SIGN UP
-  async function signUp({ email, password, name, role }) {
+  async function signUp({ email, password, name, phone, role }) {
     if (!supabase) throw new Error("Supabase client is not configured.");
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -133,6 +155,7 @@ export function AuthProvider({ children }) {
         data: {
           name: name,
           role: role,
+          phone: phone,
         },
       },
     });

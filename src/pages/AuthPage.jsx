@@ -80,9 +80,10 @@ export default function AuthPage() {
     setErr(""); setOk(""); setLoading(true);
     const name = e.target.name.value.trim();
     const email = e.target.email.value.trim();
+    const phone = e.target.phone.value.trim();
     const password = e.target.password.value;
     try {
-      const result = await signUp({ email, password, name, role });
+      const result = await signUp({ email, password, name, phone, role });
       if (result.needsEmailConfirm) {
         setOk("Account created. Check your email to confirm, then log in.");
         setTab("login");
@@ -232,6 +233,10 @@ export default function AuthPage() {
               <div className="field">
                 <label>Email address</label>
                 <input id="signup-email" name="email" type="email" required placeholder="you@example.com" />
+              </div>
+              <div className="field">
+                <label>Phone number</label>
+                <input id="signup-phone" name="phone" type="tel" required placeholder="Your phone number" />
               </div>
               <div className="field">
                 <label>Password</label>
