@@ -180,7 +180,7 @@ function Shell() {
             style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", flex: 1 }}
             title="Back to Home"
           >
-            <img src="/logo.png" alt="EcoNova Logo" style={{ height: "40px", objectFit: "contain" }} />
+            <img src="/logo.png" alt="EcoNova Logo" style={{ width: "160px", height: "auto", objectFit: "contain", marginLeft: "-4px" }} />
           </div>
           <button
             className="mobile-sidebar-close"

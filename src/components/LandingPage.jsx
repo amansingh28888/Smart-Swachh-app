@@ -146,7 +146,7 @@ export default function LandingPage({ onGetStarted }) {
         <div className="landing-container navbar-inner">
 
           <div className="landing-logo">
-            <img src="/logo.png" alt="EcoNova Logo" style={{ height: "40px", objectFit: "contain" }} />
+            <img src="/logo.png" alt="EcoNova Logo" style={{ width: "160px", height: "auto", objectFit: "contain", marginLeft: "-12px", transform: "scale(1.2)" }} />
           </div>
 
           <div className="nav-links">
@@ -555,7 +555,7 @@ export default function LandingPage({ onGetStarted }) {
         <div className="landing-container footer-inner">
 
           <div className="footer-brand">
-            <img src="/logo.png" alt="EcoNova Logo" style={{ height: "40px", objectFit: "contain", marginBottom: "8px" }} />
+            <img src="/logo.png" alt="EcoNova Logo" style={{ width: "180px", height: "auto", objectFit: "contain", marginBottom: "8px", marginLeft: "-10px" }} />
             <div className="footer-tagline">Smarter Waste. Cleaner Cities. Greener Future.</div>
           </div>
 

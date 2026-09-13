@@ -101,7 +101,7 @@ export default function AuthPage() {
       <div className="auth-brand-panel">
 
         <div className="auth-brand-logo">
-          <img src="/logo.png" alt="EcoNova Logo" style={{ height: "60px", objectFit: "contain", marginBottom: "16px" }} />
+          <img src="/logo.png" alt="EcoNova Logo" style={{ width: "240px", height: "auto", objectFit: "contain", marginBottom: "16px", transform: "scale(1.1)" }} />
         </div>
 
         <h2 className="auth-brand-heading">
