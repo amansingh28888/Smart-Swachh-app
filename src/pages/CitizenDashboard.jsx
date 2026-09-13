@@ -24,6 +24,7 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
 
   const [reports, setReports] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [topCitizens, setTopCitizens] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [reportFilter, setReportFilter] = useState("all");
@@ -57,6 +58,14 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
     }
 
     setWithdrawals(w || []);
+
+    const { data: top } = await supabase
+      .from("profiles")
+      .select("id, name, points")
+      .eq("role", "citizen")
+      .order("points", { ascending: false })
+      .limit(5);
+    setTopCitizens(top || []);
   }
 
   useEffect(() => {
@@ -354,6 +363,43 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
               </div>
             </div>
           </div>
+
+          {/* TOP ECO-WARRIORS LEADERBOARD */}
+          {topCitizens.length > 0 && (
+            <div className="reports-section-header" style={{ marginTop: "32px", marginBottom: "16px" }}>
+              <div>
+                <div className="section-small-title">GAMIFICATION</div>
+                <h2>🏆 Top Eco-Warriors Leaderboard</h2>
+              </div>
+            </div>
+          )}
+          {topCitizens.length > 0 && (
+            <div className="leaderboard-grid" style={{ display: "grid", gap: "12px", marginBottom: "32px" }}>
+              {topCitizens.map((tc, index) => {
+                let badge = "";
+                if (index === 0) badge = "🥇 Gold";
+                else if (index === 1) badge = "🥈 Silver";
+                else if (index === 2) badge = "🥉 Bronze";
+
+                return (
+                  <div key={tc.id} className="report-wrapper" style={{ padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center", background: tc.id === profile.id ? "var(--bg-card-highlight, #f2f9f5)" : "var(--bg-card)", border: tc.id === profile.id ? "2px solid var(--primary)" : "1px solid var(--border)", borderRadius: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--ink-muted)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
+                        #{index + 1}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: "16px" }}>{tc.name} {tc.id === profile.id && "(You)"}</div>
+                        <div style={{ fontSize: "12px", color: "var(--ink-soft)" }}>{badge}</div>
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: "18px", color: "var(--primary)" }}>
+                      {tc.points} pts
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* REWARDS & COUPONS PANEL */}
           {showWithdraw && (

@@ -251,3 +251,52 @@ Answer:`,
     return getLocalWasteAdvice(question);
   }
 }
+
+// ==========================================
+// PREDICTIVE AI ANALYTICS (ADMIN)
+// ==========================================
+
+export async function generatePredictiveInsights(reports) {
+  if (!CONFIG.GEMINI_API_KEY) {
+    return "Gemini API key is required for predictive insights. Please configure VITE_GEMINI_API_KEY in your .env file.";
+  }
+
+  // Summarize recent active reports to send to Gemini
+  const activeReports = reports.filter(r => r.status !== 'completed' && r.status !== 'approved');
+  const summary = activeReports.slice(0, 20).map(r => 
+    `- Category: ${r.category}, Status: ${r.status}, Location: Lat ${r.location_lat?.toFixed(4)}, Lng ${r.location_lng?.toFixed(4)}`
+  ).join("\n");
+
+  const prompt = `You are an AI Analytics engine for SmartSwachh waste management platform.
+Analyze the following active waste reports and provide a short, single-paragraph predictive insight (max 3 sentences) for the municipal admin. 
+Identify any critical clusters or patterns, and suggest an actionable priority.
+
+Recent Active Reports Data:
+${summary || "No active reports."}
+
+Insight:`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
+
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!resp.ok) {
+      throw new Error("Failed to fetch insights");
+    }
+
+    const data = await resp.json();
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to generate insights at this time.";
+  } catch (error) {
+    console.error("Predictive AI error:", error);
+    return "Predictive analytics temporarily unavailable due to a connection error.";
+  }
+}
