@@ -73,7 +73,7 @@ export default function WorkerDashboard({ activeNav = 0, setActiveNav }) {
     if (!profile?.id) return;
     const { data, error } = await supabase
       .from("reports")
-      .select("*")
+      .select("*, profiles!citizen_id(name, phone)")
       .eq("assigned_worker_id", profile.id)
       .order("created_at", { ascending: false });
 
@@ -250,6 +250,16 @@ export default function WorkerDashboard({ activeNav = 0, setActiveNav }) {
                         </button>
                       </div>
 
+                      {/* Display Citizen Contact if available and task not completed */}
+                      {r.status !== "completed" && r.profiles?.phone && (
+                        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                          <span>📞</span>
+                          <div>
+                            <strong>Citizen Contact:</strong> <a href={`tel:${r.profiles.phone}`} style={{ color: "#15803d", textDecoration: "underline" }}>{r.profiles.phone}</a>
+                          </div>
+                        </div>
+                      )}
+
                       {r.status === "assigned" && (
                         <button className="btn-worker-primary" onClick={() => markInProgress(r.id)}>
                           <IconPlay /> Start Cleanup Task
@@ -349,6 +359,16 @@ export default function WorkerDashboard({ activeNav = 0, setActiveNav }) {
                           <IconNavigation /><span>GPS Directions</span>
                         </button>
                       </div>
+
+                      {/* Display Citizen Contact if available and task not completed */}
+                      {r.status !== "completed" && r.profiles?.phone && (
+                        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                          <span>📞</span>
+                          <div>
+                            <strong>Citizen Contact:</strong> <a href={`tel:${r.profiles.phone}`} style={{ color: "#15803d", textDecoration: "underline" }}>{r.profiles.phone}</a>
+                          </div>
+                        </div>
+                      )}
 
                       {r.status === "assigned" && (
                         <button className="btn-worker-primary" onClick={() => markInProgress(r.id)}>
