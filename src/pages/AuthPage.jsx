@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { GoogleLogin } from '@react-oauth/google';
 
 // ── SVG icons ──────────────────────────────────────────────
 const IconRecycle = () => (
@@ -35,15 +36,31 @@ const IconUsers = () => (
   </svg>
 );
 
+// Removed IconGoogle as we're using the official GoogleLogin component
+
 // ──────────────────────────────────────────────────────────
 
 export default function AuthPage() {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, signInWithGoogleToken } = useAuth();
   const [tab, setTab] = useState("login");
   const [role, setRole] = useState("citizen");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState("");
+
+  async function handleGoogleSuccess(credentialResponse) {
+    setErr(""); setOk(""); setLoading(true);
+    try {
+      await signInWithGoogleToken(credentialResponse.credential, { role });
+    } catch (error) {
+      setErr(error.message);
+      setLoading(false);
+    }
+  }
+
+  function handleGoogleError() {
+    setErr("Google Sign In was unsuccessful. Try again later.");
+  }
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -146,6 +163,23 @@ export default function AuthPage() {
 
           {err && <div className="msg error">{err}</div>}
           {ok  && <div className="msg ok">{ok}</div>}
+
+          {/* Google Sign In Button */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              theme="outline"
+              size="large"
+              width="100%"
+              text={tab === "login" ? "signin_with" : "signup_with"}
+            />
+          </div>
+
+          <div className="auth-divider">
+            <span>or continue with email</span>
+          </div>
 
           {tab === "login" ? (
 

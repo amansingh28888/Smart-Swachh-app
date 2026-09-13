@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
 
   // Load user profile from database
   const loadProfile = useCallback(async (userId) => {
+    if (!supabase) return null;
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
@@ -24,6 +25,45 @@ export function AuthProvider({ children }) {
       .single();
 
     if (error) {
+      // Auto-create profile if missing (e.g. initial Google OAuth login)
+      if (error.code === "PGRST116" || error.message?.includes("0 rows")) {
+        try {
+          const { data: userData } = await supabase.auth.getUser();
+          const u = userData?.user;
+          if (u) {
+            const name =
+              u.user_metadata?.full_name ||
+              u.user_metadata?.name ||
+              u.email?.split("@")[0] ||
+              "User";
+            const pendingRole = localStorage.getItem("pending_role");
+            const role = pendingRole || u.user_metadata?.role || "citizen";
+            if (pendingRole) {
+              localStorage.removeItem("pending_role");
+            }
+
+            const newProfile = {
+              id: u.id,
+              name: name,
+              email: u.email || "",
+              role: role,
+              points: 0,
+            };
+            const { data: createdProfile, error: insertError } = await supabase
+              .from("profiles")
+              .insert([newProfile])
+              .select()
+              .single();
+
+            if (!insertError && createdProfile) {
+              setProfile(createdProfile);
+              return createdProfile;
+            }
+          }
+        } catch (err) {
+          console.error("Auto profile creation failed:", err);
+        }
+      }
       console.error("Profile load error:", error);
       setProfile(null);
       return null;
@@ -38,6 +78,11 @@ export function AuthProvider({ children }) {
     let mounted = true;
 
     const initializeAuth = async () => {
+      if (!supabase) {
+        if (mounted) setLoading(false);
+        return;
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -55,6 +100,8 @@ export function AuthProvider({ children }) {
 
     initializeAuth();
 
+    if (!supabase) return;
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
@@ -71,12 +118,13 @@ export function AuthProvider({ children }) {
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [loadProfile]);
 
   // SIGN UP
   async function signUp({ email, password, name, role }) {
+    if (!supabase) throw new Error("Supabase client is not configured.");
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -107,8 +155,9 @@ export function AuthProvider({ children }) {
     };
   }
 
-  // SIGN IN
+  // SIGN IN WITH EMAIL/PASSWORD
   async function signIn({ email, password }) {
+    if (!supabase) throw new Error("Supabase client is not configured.");
     const { data, error } =
       await supabase.auth.signInWithPassword({
         email,
@@ -132,8 +181,35 @@ export function AuthProvider({ children }) {
     return userProfile;
   }
 
+  // SIGN IN WITH GOOGLE ID TOKEN
+  async function signInWithGoogleToken(idToken, meta = {}) {
+    if (!supabase) {
+      throw new Error(
+        "Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY."
+      );
+    }
+    
+    if (meta.role) {
+      localStorage.setItem("pending_role", meta.role);
+    }
+
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: "google",
+      token: idToken,
+    });
+
+    if (error) throw error;
+    
+    if (data.session) {
+      await loadProfile(data.session.user.id);
+    }
+
+    return data;
+  }
+
   // SIGN OUT
   async function signOut() {
+    if (!supabase) return;
     const { error } = await supabase.auth.signOut();
 
     if (error) throw error;
@@ -158,6 +234,7 @@ export function AuthProvider({ children }) {
         loading,
         signUp,
         signIn,
+        signInWithGoogleToken,
         signOut,
         reloadProfile,
       }}

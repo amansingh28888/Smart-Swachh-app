@@ -160,17 +160,38 @@ create policy "waste-photos: authenticated upload" on storage.objects
   for insert with check (bucket_id = 'waste-photos' and auth.role() = 'authenticated');
 
 -- ============================================================
--- DONE. Next step: create your admin account.
--- 1. Sign up once from the website's login screen using:
---       email:    amansingh28888@gmail.com
---       password: Aman@2004
---    (use the "Citizen" or "Worker" tab, role does not matter here —
---     you will fix it below.)
--- 2. Then run this (only once, after signup):
---
---    update public.profiles
---    set role = 'admin'
---    where email = 'amansingh28888@gmail.com';
---
--- 3. Log out and log back in — you'll now land on the Admin dashboard.
+-- 5. TRIGGER FOR AUTOMATIC PROFILE CREATION (Google OAuth & Email)
+-- ============================================================
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.profiles (id, name, email, role, points)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+    coalesce(new.email, ''),
+    coalesce(new.raw_user_meta_data->>'role', 'citizen'),
+    0
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- ============================================================
+-- GOOGLE SIGN IN SETUP IN SUPABASE:
+-- 1. Go to Google Cloud Console (https://console.cloud.google.com/)
+-- 2. Create an OAuth 2.0 Client ID (Web Application)
+-- 3. Set Authorized Redirect URI in GCP:
+--    https://<YOUR_SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback
+-- 4. Go to Supabase Dashboard -> Authentication -> Providers -> Google
+-- 5. Enable Google and enter Client ID & Client Secret from GCP.
 -- ============================================================

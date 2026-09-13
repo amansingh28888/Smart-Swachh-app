@@ -354,15 +354,21 @@ function AppRouter() {
 }
 
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 // ─── MAIN APP ──────────────────────────────────────────
 
 export default function App() {
   if (!isSupabaseConfigured) return <SetupNeeded />;
 
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
   return (
-    <AuthProvider>
-      <AppRouter />
-      <Chatbot />
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AuthProvider>
+        <AppRouter />
+        <Chatbot />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
