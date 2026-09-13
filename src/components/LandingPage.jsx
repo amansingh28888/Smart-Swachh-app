@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import WasteGame from "./WasteGame";
 import { supabase } from "../supabaseClient";
 import "./LandingPage.css";
+import EcoNovaLogo from "./EcoNovaLogo";
 
 // ════════════════════════════════════════════════════════
 // SVG ICONS
@@ -146,7 +147,7 @@ export default function LandingPage({ onGetStarted }) {
         <div className="landing-container navbar-inner">
 
           <div className="landing-logo">
-            <img src="/logo.png" alt="EcoNova Logo" style={{ width: "160px", height: "auto", objectFit: "contain", marginLeft: "-12px", transform: "scale(1.2)" }} />
+            <EcoNovaLogo size={38} showTag={false} />
           </div>
 
           <div className="nav-links">
@@ -555,8 +556,7 @@ export default function LandingPage({ onGetStarted }) {
         <div className="landing-container footer-inner">
 
           <div className="footer-brand">
-            <img src="/logo.png" alt="EcoNova Logo" style={{ width: "180px", height: "auto", objectFit: "contain", marginBottom: "8px", marginLeft: "-10px" }} />
-            <div className="footer-tagline">Smarter Waste. Cleaner Cities. Greener Future.</div>
+            <EcoNovaLogo size={42} showTag={true} />
           </div>
 
           <div className="footer-right">

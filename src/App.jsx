@@ -3,6 +3,7 @@ import { useState } from "react";
 import LandingPage from "./components/LandingPage";
 import "./components/LandingPage.css";
 import Chatbot from "./components/Chatbot";
+import EcoNovaLogo from "./components/EcoNovaLogo";
 
 import {
   AuthProvider,
@@ -180,7 +181,7 @@ function Shell() {
             style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", flex: 1 }}
             title="Back to Home"
           >
-            <img src="/logo.png" alt="EcoNova Logo" style={{ width: "160px", height: "auto", objectFit: "contain", marginLeft: "-4px" }} />
+            <EcoNovaLogo size={38} showTag={false} />
           </div>
           <button
             className="mobile-sidebar-close"

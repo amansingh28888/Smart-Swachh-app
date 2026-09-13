@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { GoogleLogin } from '@react-oauth/google';
+import EcoNovaLogo from "../components/EcoNovaLogo";
 
 // ── SVG icons ──────────────────────────────────────────────
 const IconRecycle = () => (
@@ -101,7 +102,7 @@ export default function AuthPage() {
       <div className="auth-brand-panel">
 
         <div className="auth-brand-logo">
-          <img src="/logo.png" alt="EcoNova Logo" style={{ width: "240px", height: "auto", objectFit: "contain", marginBottom: "16px", transform: "scale(1.1)" }} />
+          <EcoNovaLogo size={56} showTag={true} />
         </div>
 
         <h2 className="auth-brand-heading">
