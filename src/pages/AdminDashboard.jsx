@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import ReportCard from "../components/ReportCard";
 import { CONFIG } from "../lib/config";
+import ProfileSettings from "../components/ProfileSettings";
 import { generatePredictiveInsights } from "../lib/gemini";
 
 function fmtDate(d) {
@@ -457,9 +458,11 @@ export default function AdminDashboard({ activeNav = 0, setActiveNav }) {
       {/* ================= 5: SETTINGS ================= */}
       {activeNav === 5 && (
         <>
-          <div className="view-header">
+          <ProfileSettings />
+
+          <div className="view-header" style={{ marginTop: 40 }}>
             <div>
-              <h2 className="view-title">Settings & Governance</h2>
+              <h2 className="view-title">System Governance</h2>
               <p className="view-desc">Configure reward point rates, threshold limits and system options</p>
             </div>
           </div>

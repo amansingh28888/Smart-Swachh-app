@@ -16,7 +16,6 @@ import CitizenDashboard from "./pages/CitizenDashboard";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotificationDropdown from "./components/NotificationDropdown";
-import ProfileModal from "./components/ProfileModal";
 
 // ─── Sidebar SVG icons ─────────────────────────────────
 
@@ -113,11 +112,13 @@ const NAV_CONFIG = {
     { icon: <IconClipboard />, label: "My Reports" },
     { icon: <IconMapPin />,    label: "Live Map" },
     { icon: <IconBarChart />,  label: "Analytics" },
+    { icon: <IconSettings />,  label: "Profile & Settings" },
   ],
   worker: [
     { icon: <IconGrid />,      label: "Dashboard" },
     { icon: <IconClipboard />, label: "Work Queue" },
     { icon: <IconMapPin />,    label: "Locations" },
+    { icon: <IconSettings />,  label: "Profile & Settings" },
   ],
   admin: [
     { icon: <IconGrid />,      label: "Dashboard" },
@@ -138,7 +139,6 @@ function Shell() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(2);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
 
   if (showLanding) {
     return <LandingPage onGetStarted={() => setShowLanding(false)} />;
@@ -281,15 +281,6 @@ function Shell() {
               />
             )}
 
-            <button
-              className="topbar-bell"
-              title="Profile Settings"
-              onClick={() => setShowProfile(true)}
-              style={{ marginLeft: "8px" }}
-            >
-              <IconSettings />
-            </button>
-
             <span className="role-pill">{ROLE_LABEL[profile.role]}</span>
           </div>
         </div>
@@ -300,17 +291,6 @@ function Shell() {
           {profile.role === "worker"  && <WorkerDashboard activeNav={activeNav} setActiveNav={setActiveNav} />}
           {profile.role === "admin"   && <AdminDashboard activeNav={activeNav} setActiveNav={setActiveNav} />}
         </main>
-
-        {showProfile && (
-          <ProfileModal 
-            onClose={() => setShowProfile(false)} 
-            onUpdated={() => {
-              setShowProfile(false);
-              // Force reload by simply causing a small re-render if needed, but Context handles it mostly
-              window.location.reload();
-            }} 
-          />
-        )}
 
         {/* ═══ MOBILE BOTTOM NAVIGATION ═══ */}
         <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
