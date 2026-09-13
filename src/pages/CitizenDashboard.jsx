@@ -560,20 +560,32 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
                 <div key={r.id} className="report-wrapper">
                   <ReportCard report={r} showVerificationCode={true} />
                   {r.status === "pending_approval" && (
-                    <div className="approval-card">
-                      <div className="approval-top">
-                        <div className="approval-icon"><IconCamera /></div>
+                    <div style={{ marginTop: 16, background: "var(--bg-card-highlight, #f8fafc)", padding: 16, borderRadius: 12, border: "1px solid var(--border)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <IconCamera />
+                        </div>
                         <div>
-                          <h3>Review Completed Work</h3>
-                          <p>Please check the completion photo and confirm whether the cleaning work has been completed properly.</p>
+                          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>Review Completed Work</h3>
+                          <p style={{ margin: 0, fontSize: 13, color: "var(--ink-soft)" }}>Check the completion photo and confirm if the site is clean.</p>
                         </div>
                       </div>
-                      <div className="approval-actions">
-                        <button className="approve-btn" onClick={() => approveWork(r.id)} disabled={actionLoading === r.id}>
-                          {actionLoading === r.id ? "Processing..." : "Approve Work"}
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <button 
+                          className="btn" 
+                          style={{ flex: 1, padding: "10px 0" }} 
+                          onClick={() => approveWork(r.id)} 
+                          disabled={actionLoading === r.id}
+                        >
+                          {actionLoading === r.id ? "Processing..." : "✓ Approve & Release Points"}
                         </button>
-                        <button className="reject-btn" onClick={() => rejectWork(r.id)} disabled={actionLoading === r.id}>
-                          Reject Work
+                        <button 
+                          className="btn-outline" 
+                          style={{ flex: 1, padding: "10px 0", color: "var(--red)", borderColor: "var(--red)" }} 
+                          onClick={() => rejectWork(r.id)} 
+                          disabled={actionLoading === r.id}
+                        >
+                          ✗ Reject Work
                         </button>
                       </div>
                     </div>
