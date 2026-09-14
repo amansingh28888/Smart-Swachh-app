@@ -74,7 +74,7 @@ export default function WorkerDashboard({ activeNav = 0, setActiveNav }) {
     if (!profile?.id) return;
     const { data, error } = await supabase
       .from("reports")
-      .select("*, profiles(name, phone)")
+      .select("*, profiles!citizen_id(name, phone)")
       .eq("assigned_worker_id", profile.id)
       .order("created_at", { ascending: false });
 

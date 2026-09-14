@@ -60,7 +60,11 @@ export default function AdminDashboard({ activeNav = 0, setActiveNav }) {
       alert(`Cannot assign task: ${targetWorker.name || targetWorker.full_name || "Worker"} is currently ON BREAK.`);
       return;
     }
-    await supabase.from("reports").update({ assigned_worker_id: workerId, status: "assigned", assigned_at: new Date().toISOString() }).eq("id", reportId);
+    const { error } = await supabase.from("reports").update({ assigned_worker_id: workerId, status: "assigned", assigned_at: new Date().toISOString() }).eq("id", reportId);
+    if (error) {
+      alert("Failed to assign worker: " + error.message);
+      return;
+    }
     await load();
   }
 
