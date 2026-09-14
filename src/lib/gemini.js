@@ -17,14 +17,17 @@ function fileToBase64(file) {
 // ===============================
 
 const PROMPT = `You are a municipal waste-sorting assistant for an Indian city cleanliness app.
-Look at this photo of waste/garbage in a public place and respond with ONLY a JSON object
-(no markdown, no code fences) with these exact keys:
+Look at this photo and first determine if it's a valid garbage report.
+A valid report must show a significant amount of waste that requires a sanitation worker (not just one small item like a single wrapper, and not unrelated images like selfies or animals).
+Respond with ONLY a JSON object (no markdown, no code fences) with these exact keys:
 {
-  "waste_type": "short name of the waste, e.g. 'Mixed plastic and food waste'",
-  "category": "one of: Biodegradable, Non-biodegradable, Hazardous, Construction debris, E-waste, Mixed",
-  "suggested_bin": "which color dustbin it should go in (India norm: Green = wet/biodegradable, Blue = dry/recyclable, Red = hazardous/biomedical, Black = domestic hazardous)",
+  "is_valid": true/false (true if it's a valid garbage report, false otherwise),
+  "validation_reason": "if is_valid is false, explain why (e.g., 'No garbage visible', 'Just one small item, please use a nearby bin', 'Unrelated image')",
+  "waste_type": "short name of the waste (leave empty if invalid)",
+  "category": "one of: Biodegradable, Non-biodegradable, Hazardous, Construction debris, E-waste, Mixed (leave empty if invalid)",
+  "suggested_bin": "which color dustbin it should go in (leave empty if invalid)",
   "hazard_tips": "one short sentence on any handling precaution, or 'None' if not needed",
-  "description": "one short sentence describing the scene, written as if a citizen reported it"
+  "description": "one short sentence describing the scene"
 }`;
 
 export async function analyzeWasteImage(file) {

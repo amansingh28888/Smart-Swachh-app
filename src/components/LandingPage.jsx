@@ -45,11 +45,7 @@ const IconCamera = ({ s = 20 }) => (
     <circle cx="12" cy="13" r="3"/>
   </svg>
 );
-const IconCheck = ({ s = 20 }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6L9 17l-5-5"/>
-  </svg>
-);
+
 const IconCheckCircle = ({ s = 20 }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
@@ -91,12 +87,7 @@ const IconBell = ({ s = 16 }) => (
     <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
 );
-const IconTrendUp = ({ s = 16 }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
-    <polyline points="16 7 22 7 22 13"/>
-  </svg>
-);
+
 
 // ════════════════════════════════════════════════════════
 // LANDING PAGE
@@ -105,15 +96,6 @@ const IconTrendUp = ({ s = 16 }) => (
 export default function LandingPage({ onGetStarted }) {
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
   const [recentReports, setRecentReports] = useState([]);
-
-  useEffect(() => {
-    fetchLiveData();
-    const sub = supabase
-      .channel("landing-live")
-      .on("postgres_changes", { event: "*", schema: "public", table: "reports" }, fetchLiveData)
-      .subscribe();
-    return () => supabase.removeChannel(sub);
-  }, []);
 
   async function fetchLiveData() {
     try {
@@ -132,6 +114,15 @@ export default function LandingPage({ onGetStarted }) {
       console.error(err);
     }
   }
+
+  useEffect(() => {
+    fetchLiveData();
+    const sub = supabase
+      .channel("landing-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "reports" }, fetchLiveData)
+      .subscribe();
+    return () => supabase.removeChannel(sub);
+  }, []);
 
   const statusLabel = s => ({ pending:"Pending", assigned:"Active", in_progress:"Active", completed:"Resolved" }[s] || "New");
   const statusBadge = s => s === "completed" ? "resolved" : (s === "assigned" || s === "in_progress") ? "active" : "pending";

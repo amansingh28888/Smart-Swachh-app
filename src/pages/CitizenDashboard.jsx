@@ -18,7 +18,6 @@ const IconAlertCircle = () => (<svg width="16" height="16" viewBox="0 0 24 24" f
 const IconArrowUpRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>);
 const IconCamera = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>);
 const IconPlus = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>);
-const IconX = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>);
 
 export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
   const { profile, reloadProfile } = useAuth();
@@ -228,7 +227,7 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
       return;
     }
 
-    const uniqueCode = `${coupon.codePrefix}${Math.floor(100000 + Math.random() * 900000)}`;
+    const uniqueCode = `${coupon.codePrefix}${Date.now().toString().slice(-6)}`;
 
     try {
       const { error: wErr } = await supabase.from("withdrawals").insert({

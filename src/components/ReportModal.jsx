@@ -90,6 +90,13 @@ export default function ReportModal({
     // AI Waste Analysis
     try {
       const ai = await analyzeWasteImage(file);
+      
+      if (ai.is_valid === false) {
+        setErr(`Image Rejected: ${ai.validation_reason || "This does not appear to be a valid garbage report."}`);
+        setAnalyzing(false);
+        return;
+      }
+
       setForm({
         waste_type: ai.waste_type || "",
         category: ai.category || "",
