@@ -28,8 +28,9 @@ create table if not exists public.reports (
   location_lat double precision,
   location_lng double precision,
   location_address text,
-  status text not null default 'pending' check (status in ('pending','assigned','in_progress','completed')),
+  status text not null default 'pending' check (status in ('pending','assigned','in_progress','pending_approval','approved','reopened','completed')),
   assigned_worker_id uuid references public.profiles(id),
+  verification_code text,
   points_awarded int not null default 10,
   created_at timestamptz not null default now(),
   assigned_at timestamptz,
@@ -195,3 +196,18 @@ create trigger on_auth_user_created
 -- 4. Go to Supabase Dashboard -> Authentication -> Providers -> Google
 -- 5. Enable Google and enter Client ID & Client Secret from GCP.
 -- ============================================================
+
+-- ============================================================
+-- MIGRATION: Run this section if you already have the tables created
+-- with the old schema. It updates the status constraint to support
+-- the full workflow and adds the verification_code column.
+-- ============================================================
+
+-- Step 1: Add verification_code column if missing
+ALTER TABLE public.reports ADD COLUMN IF NOT EXISTS verification_code text;
+
+-- Step 2: Drop the old status constraint and create a new one
+-- that includes all workflow statuses
+ALTER TABLE public.reports DROP CONSTRAINT IF EXISTS reports_status_check;
+ALTER TABLE public.reports ADD CONSTRAINT reports_status_check
+  CHECK (status IN ('pending','assigned','in_progress','pending_approval','approved','reopened','completed'));

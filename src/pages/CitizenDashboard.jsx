@@ -91,10 +91,14 @@ export default function CitizenDashboard({ activeNav = 0, setActiveNav }) {
     setOk("");
 
     try {
+      // Generate a 6-digit SmartVerify code
+      const verificationCode = String(Math.floor(100000 + Math.random() * 900000));
+
       const { error } = await supabase
         .from("reports")
         .update({
           status: "approved",
+          verification_code: verificationCode,
         })
         .eq("id", reportId)
         .eq("citizen_id", profile.id);
